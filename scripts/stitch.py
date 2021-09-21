@@ -3,30 +3,23 @@
 """
 @author: Arya Massarat
 This code is adapted from Yu-Hsuan Tu at https://github.com/dobedobedo/PhotoScan-Workflow/
-
 This Python Script is developed for Agisoft PhotoScan (current MetaShape) 1.3.4
 Python core is 3.5.2
-
 22 October 2019 Update: Add tie point error reduction following the USGS guidline
                         Add the 3D model parameters to user variables
 11 January 2019 Update: Add compatibility of MetaShape 1.5.0
 Update: Add compatibility of PhotoScan 1.4.0
-
 This script runs through all chunks and will do the following:
     1. Align Photos if there's no tie point
     2. Do the standard process if there is tie point
-
 When aligning photos, users can decide whether using image quality to disable bad photos
-
 GCP needs to be marked manually
-
 Prerequisites for standard workflow:
     1. Set CRS
     2. Photo alignment
     3. Marking GCP
     4. Optimse Camera
     5. Set Region
-
 The standard workflow includes:
     Build dense point cloud
     Point cloud classification
@@ -307,6 +300,7 @@ def create_doc(images_path, ext=None):
         str(image) for image in images if image.suffix == ext
     ]
     chunk.addPhotos(images)
+    chunk.loadReferenceExif(load_rotation=True, load_accuracy=True)
     return doc
 
 # The following process will only be executed when running script    
@@ -357,4 +351,3 @@ if __name__ == '__main__':
                          Quality=Quality, FilterMode=FilterMode, 
                          Max_Angle=Max_Angle, Cell_Size=Cell_Size, 
                          BlendingMode=BlendingMode)
-

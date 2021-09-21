@@ -29,11 +29,13 @@ parser.add_argument(
 )
 args = parser.parse_args()
 
+import os
+os.environ["OPENCV_IO_MAX_IMAGE_PIXELS"] = pow(2,70).__str__()
 import cv2 as cv
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
-
+import tifffile as tiff
 
 TRANSPARENCY = 0.65
 
@@ -48,9 +50,11 @@ if args.predicts is not None:
 else:
     predicts = None
 
-img = cv.imread(args.img)
+#img = cv.imread(args.img)
+img = tiff.imread(args.img)
 # add alpha channel (ie transparency)
-img = cv.cvtColor(img, cv.COLOR_RGB2RGBA)
+#img = cv.cvtColor(img, cv.COLOR_RGB2RGBA)
+segments_only = np.zeros(img.shape, np.uint8)
 
 def handle_label(i):
     """ return the row corresponding with the label"""
@@ -101,6 +105,7 @@ if args.segments.endswith('.json'):
         # draw each label onto the img
         for i in range(len(labels)):
             cv.drawContours(img, labels, i, get_color(predicts, label_keys[i]), 7)
+            cv.drawContours(segment_only, labels, i, get_color(predicts, label_keys[i]), 7)
             if args.label:
                 # first, get the top, right corner of the polygon
                 # and use it as the bottom left, corner of the text
@@ -111,6 +116,7 @@ if args.segments.endswith('.json'):
         # draw each label onto the img
         for i in range(len(labels)):
             cv.drawContours(img, labels, i, get_color(predicts, i), 7)
+            cv.drawContours(segments_only, labels, i, get_color(predicts, i), 7)
             if args.label:
                 # first, get the top, right corner of the polygon
                 # and use it as the bottom left, corner of the text
@@ -143,3 +149,4 @@ else:
     raise Exception('label format not supported yet')
 
 cv.imwrite(args.out, img.astype(np.uint8))
+#cv.imwrite(args.out, segments_only.astype(np.uint8))

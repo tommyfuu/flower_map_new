@@ -41,19 +41,22 @@ if not (len(args.high) == len(args.low) and len(args.high) and args.out.endswith
     parser.error('Unsupported segments input (high and low args) or output (out arg) file type. The files must have a .json ending.')
 
 import json
+import os
+os.environ["OPENCV_IO_MAX_IMAGE_PIXELS"] = pow(2,80).__str__()
 import cv2 as cv
 import numpy as np
 import scipy.ndimage
 import import_labelme
 from imantics import Polygons
-
+import tifffile as tiff
 # uncomment this stuff for testing
-from test_util import *
-import matplotlib.pyplot as plt
-plt.ion()
+#from test_util import *
+#import matplotlib.pyplot as plt
+#plt.ion()
 
 
-def import_segments(file, img_shape=cv.imread(args.ortho)[-2::-1], pts=True):
+#def import_segments(file, img_shape=cv.imread(args.ortho)[-2::-1], pts=True):
+def import_segments(file, img_shape, pts=True):
     """
         import the segments in whatever format they're in as a bool mask
         provide img_shape if you want to ignore the coordinates of segments that lie outside of the img
@@ -79,7 +82,8 @@ def import_segments(file, img_shape=cv.imread(args.ortho)[-2::-1], pts=True):
         raise Exception('Unsupported input file format.')
     return (pts, segments) if type(pts) is dict else segments
 
-def load_segments(high, low, high_all=None, low_all=None, img_shape=cv.imread(args.ortho)[:2]):
+#def load_segments(high, low, high_all=None, low_all=None, img_shape=cv.imread(args.ortho)[:2]):
+def load_segments(high, low, high_all=None, low_all=None, img_shape=None):
     """ load the segments and merge them with a cumulative OR of the segments """
     # first, load the segments as boolean masks
     pts, high_segs = import_segments(high, img_shape[::-1])
@@ -118,7 +122,8 @@ def export_results(ret, markers, out):
 
 
 print('loading orthomosaic')
-img = cv.imread(args.ortho)
+img = tiff.imread(args.ortho)
+print(img.shape)
 
 print('loading segments')
 high, low = None, None
@@ -164,7 +169,9 @@ markers = markers+1
 markers[unknown==1] = 0
 
 print('running the watershed algorithm')
-markers = cv.watershed(img,markers)
+markers = cv.watershed(img[:,:,0:3],markers)
+print('finished watershed')
+
 # clean up the indices
 # merge background with old background
 markers[markers == -1] = 1

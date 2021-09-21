@@ -22,12 +22,13 @@ args.out += '/' if not args.out.endswith('/') else ''
 import Metashape
 import numpy as np
 
-
 def rev_transform(chunk, points):
     """transform orthomosaic pixel coordinates to camera coordinates"""
     # get the width and height of the orthomosaic in latitute and longitude units
     x = chunk.orthomosaic.right-chunk.orthomosaic.left
     y = chunk.orthomosaic.top-chunk.orthomosaic.bottom
+    #x = chunk.orthomosaic.left
+    #y = chunk.orthomosaic.bottom
     # create a new Metashape "Shape"
     chunk.shapes = Metashape.Shapes()
     chunk.shapes.crs = chunk.crs
@@ -43,12 +44,19 @@ def rev_transform(chunk, points):
         for point in points
     ]
     # add z coords to every x/y point
-    chunk.shapes.updateAltitudes(chunk.shapes)
     # check: did this actually work?
     # sometimes updateAltitudes won't work. I suspect that this happens when the points are outside our digital elevation model
+    chunk.shapes.updateAltitudes(chunk.shapes)
+    #try:
+        #chunk.shapes.updateAltitudes(chunk.shapes)
+        #print("Not skipped!")
+    #except RuntimeError:
+        #print("Skipped!")
+        #return []
     if not shape.has_z:
         # just ignore this segment
         return []
+
     # prepare results: a dictionary keyed by a camera label, containing the coords in that camera
     results = {}
     for camera in chunk.cameras:
@@ -74,7 +82,6 @@ def rev_transform(chunk, points):
             results[camera.label] = vertices
     return results
 
-
 # open the metashape document
 doc = Metashape.Document()
 doc.open(args.project_file, read_only=True)
@@ -84,6 +91,7 @@ for chunk in doc.chunks:
     # ie the one with the orthomosaic in it
     if chunk.orthomosaic is not None:
         break
+
 
 # create the dir if it doesn't already exist
 Path(args.out).mkdir(exist_ok=True)
