@@ -122,7 +122,7 @@ rule export_ortho:
         rules.stitch.output.project
     output:
         str(Path(rules.stitch.output.project).parents[0])+"/ortho.tiff"
-    conda: "envs/default.yml"
+    conda: "envs/export_ortho.yml"
     benchmark: config['out']+"/{sample}/benchmark/export_ortho.tsv"
     threads: config['cores']
     shell:
@@ -453,25 +453,25 @@ rule map:
         "scripts/map.py {input.img} {input.labels} {output} {input.predicts}"
 
 ### extract image rule: for recovering the source images given a set of labels
-rule extract_images:
-    """for recovering the source images given a set of labels from segment_map(_exp).tiff"""
-    input:
-        sourceDir =  config['out']+"/{sample}/rev_transforms/"
-    params:
-        labels =  config['extracted_labels']
-    output:
-        config['out']+"/{sample}/label_Images.txt"
-    conda: "envs/default.yml"
-    shell:
-        "scripts/extract_images.py {input.sourceDir} {params.labels} {output}"
-        
-rule subset_images:
-    """for subsetting images following the extract_images methods"""
-    input:
-        imageSourceInput = lambda wildcards: SAMP[wildcards.sample],
-        extractImageOutput = rules.extract_images.output,
-    output:
-        config['out']+"/{sample}/subsetImages/subsetImagesLog.txt"
-    conda: "envs/default.yml"
-    shell:
-        "scripts/subset_images.py {input.imageSourceInput} {input.extractImageOutput} {output}"
+#rule extract_images:
+#    """for recovering the source images given a set of labels from segment_map(_exp).tiff"""
+#    input:
+#        sourceDir =  config['out']+"/{sample}/rev_transforms/"
+#    params:
+#        labels =  config['extracted_labels']
+#    output:
+#        config['out']+"/{sample}/label_Images.txt"
+#    conda: "envs/default.yml"
+#    shell:
+#        "scripts/extract_images.py {input.sourceDir} {params.labels} {output}"
+#        
+#rule subset_images:
+#    """for subsetting images following the extract_images methods"""
+#    input:
+#        imageSourceInput = lambda wildcards: SAMP[wildcards.sample],
+#        extractImageOutput = rules.extract_images.output,
+#    output:
+#        config['out']+"/{sample}/subsetImages/subsetImagesLog.txt"
+#    conda: "envs/default.yml"
+#    shell:
+#        "scripts/subset_images.py {input.imageSourceInput} {input.extractImageOutput} {output}"
