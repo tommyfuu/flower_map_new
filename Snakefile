@@ -443,12 +443,17 @@ rule map:
         "scripts/map.py {input.img} {input.labels} {output} {input.predicts}"
 
 ### extract image rule: for recovering the source images given a set of labels
+if 'extract_labels' not in config:
+    user_extracted_labels = []
+else:
+    user_extracted_labels = config['extracted_labels']
+
 rule extract_images:
     """for recovering the source images given a set of labels from segment_map(_exp).tiff"""
     input:
         sourceDir =  config['out']+"/{sample}/rev_transforms/"
     params:
-        labels =  config['extracted_labels']
+        labels =  user_extracted_labels
     output:
         config['out']+"/{sample}/label_Images.txt"
     conda: "envs/default.yml"
