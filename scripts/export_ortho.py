@@ -22,4 +22,5 @@ for chunk in doc.chunks:
         break
 
 # export the orthomosaic
-chunk.exportOrthomosaic(args.out, split_in_blocks = True)
+# chunk.exportPoints().split_in_blocks = True
+chunk.exportOrthomosaic(args.out, tiff_big = True)

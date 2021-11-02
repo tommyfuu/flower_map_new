@@ -53,7 +53,17 @@ import matplotlib.pyplot as plt
 plt.ion()
 
 
-def import_segments(file, img_shape=cv.imread(args.ortho)[-2::-1], pts=True):
+import os
+from skimage.io import imread
+absolute_path = os.path.abspath(__file__)
+print("Full path: " + absolute_path)
+print("Full Args Ortho", '/mnt/biology/donaldson/tom/flower_map_new/'+args.ortho)
+# print("ARGS.ORTHO", args.ortho)
+# img = plt.imread(args.ortho)
+# print("img.shape", img.shape)
+# print("aha", img[-2::-1])
+
+def import_segments(file, img_shape=imread(args.ortho)[-2::-1], pts=True):
     """
         import the segments in whatever format they're in as a bool mask
         provide img_shape if you want to ignore the coordinates of segments that lie outside of the img
@@ -79,7 +89,7 @@ def import_segments(file, img_shape=cv.imread(args.ortho)[-2::-1], pts=True):
         raise Exception('Unsupported input file format.')
     return (pts, segments) if type(pts) is dict else segments
 
-def load_segments(high, low, high_all=None, low_all=None, img_shape=cv.imread(args.ortho)[:2]):
+def load_segments(high, low, high_all=None, low_all=None, img_shape=imread(args.ortho)[:2]):
     """ load the segments and merge them with a cumulative OR of the segments """
     # first, load the segments as boolean masks
     pts, high_segs = import_segments(high, img_shape[::-1])
@@ -118,7 +128,7 @@ def export_results(ret, markers, out):
 
 
 print('loading orthomosaic')
-img = cv.imread(args.ortho)
+img = imread(args.ortho)
 
 print('loading segments')
 high, low = None, None
