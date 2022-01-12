@@ -7,6 +7,7 @@ def find_images(csv_summary_path, directory_path, output_txt_path, gDrive_path):
     start_list = a['image_name_start'].tolist()
     end_list = a['image_name_end'].tolist()
     all_contained_image_names = []
+    print("prep start, identifying all images")
     for index in range(len(start_list)):
         current_start = start_list[index]
         current_end = end_list[index]
@@ -28,20 +29,18 @@ def find_images(csv_summary_path, directory_path, output_txt_path, gDrive_path):
                 current_range_image_names.append(current_prefix+'0'+str(image)+".JPG")
             elif len(str(image)) == 1:
                 current_range_image_names.append(current_prefix+'000'+str(image)+".JPG")
-        # current_range_image_names = [current_prefix+'0'+str(image)+".JPG" for image in current_range]
-        # current_range_image_names = [directory_path+"/"+current_prefix+str(image)+".JPG" for image in current_range]
         all_contained_image_names.extend(current_range_image_names)
-
+    print("writing image names to txt file at", output_txt_path)
     with open(output_txt_path, 'w') as f:
         for item in all_contained_image_names:
-            print(item)
             f.write("%s\n" % item)
     
     include_from = '--include-from='+output_txt_path
     
     process = 'rclone copy '+directory_path+" "+gDrive_path+" "+include_from +" -v"
+    print("prep finished, run the following command to upload all chosen images")
     print(process)
-    # process = Popen(['rclone', 'copy', directory_path, gDrive_path, include_from], stdout=PIPE, stderr=PIPE)
+    # process = Popen(['rclone', 'copy', directory_path, gDrive_path, include_from, '-v'], stdout=PIPE, stderr=PIPE)
     # stdout, stderr = process.communicate()
     return all_contained_image_names
 
@@ -55,7 +54,33 @@ def find_images(csv_summary_path, directory_path, output_txt_path, gDrive_path):
 #         '/mnt/biology/donaldson/tom/flower_map_new/useful_images_summaries/0711_CentralEastern_summary.txt',
 #         '"knuthXGDrive:/Bee Lab/Projects/Bee Forage Mapping/Bee Forage Mapping - Tom Thesis/dataToBeLabelled/071121_CentralEastern"')
 
-find_images('/mnt/biology/donaldson/tom/flower_map_new/071621_South.csv',
-        '/mnt/biology/donaldson/tom/flower_map_new/newData/071621_South',
-        '/mnt/biology/donaldson/tom/flower_map_new/071621_South.csv',
-        '"knuthXGDrive:/Bee Lab/Projects/Bee Forage Mapping/Bee Forage Mapping - Tom Thesis/dataToBeLabelled/071621_South"')
+# find_images('/mnt/biology/donaldson/tom/flower_map_new/071621_South.csv',
+#         '/mnt/biology/donaldson/tom/flower_map_new/newData/071621_South',
+#         '/mnt/biology/donaldson/tom/flower_map_new/useful_images_summaries/071621_South_summary.txt',
+#         '"knuthXGDrive:/Bee Lab/Projects/Bee Forage Mapping/Bee Forage Mapping - Tom Thesis/dataToBeLabelled/071621_South"')
+
+
+# find_images('/mnt/biology/donaldson/tom/flower_map_new/071121_Western.csv',
+#         '/mnt/biology/donaldson/tom/flower_map_new/newData/071121_Western',
+#         '/mnt/biology/donaldson/tom/flower_map_new/useful_images_summaries/071121_Western_summary.txt',
+#         '"knuthXGDrive:/Bee Lab/Projects/Bee Forage Mapping/Bee Forage Mapping - Tom Thesis/dataToBeLabelled/071121_Western"')
+
+# find_images('/mnt/biology/donaldson/tom/flower_map_new/2017_6217East.csv',
+#         '/mnt/biology/donaldson/tom/flower_map/data/Week3/6217East',
+#         '/mnt/biology/donaldson/tom/flower_map_new/useful_images_summaries/2017_6217East_summary.txt',
+#         '"knuthXGDrive:/Bee Lab/Projects/Bee Forage Mapping/Bee Forage Mapping - Tom Thesis/dataToBeLabelled/2017_6217East"')
+
+# find_images('/mnt/biology/donaldson/tom/flower_map_new/2017_6617East1.csv',
+#         '/mnt/biology/donaldson/tom/flower_map/data/Week4/6617East1',
+#         '/mnt/biology/donaldson/tom/flower_map_new/useful_images_summaries/2017_6617East1_summary.txt',
+#         '"knuthXGDrive:/Bee Lab/Projects/Bee Forage Mapping/Bee Forage Mapping - Tom Thesis/dataToBeLabelled/2017_6617East1"')
+
+find_images('/mnt/biology/donaldson/tom/flower_map_new/2017_6617East2.csv',
+        '/mnt/biology/donaldson/tom/flower_map/data/Week4/6617East2',
+        '/mnt/biology/donaldson/tom/flower_map_new/useful_images_summaries/2017_6617East2_summary.txt',
+        '"knuthXGDrive:/Bee Lab/Projects/Bee Forage Mapping/Bee Forage Mapping - Tom Thesis/dataToBeLabelled/2017_6617East2"')
+
+# find_images('/mnt/biology/donaldson/tom/flower_map_new/2017_6917West.csv',
+#         '/mnt/biology/donaldson/tom/flower_map/data/Week4/6917West',
+#         '/mnt/biology/donaldson/tom/flower_map_new/useful_images_summaries/2017_6917West_summary.txt',
+#         '"knuthXGDrive:/Bee Lab/Projects/Bee Forage Mapping/Bee Forage Mapping - Tom Thesis/dataToBeLabelled/2017_6917West"')
