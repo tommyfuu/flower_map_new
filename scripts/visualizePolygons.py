@@ -5,6 +5,12 @@ import cv2  # python-opencv
 import numpy as np
 import time
 
+## aim
+# visualize datasets of images with their annotations
+# generate individual json files usable for training mask r-cnn models
+
+OPTION = 'visualize' # either visualize or json
+
 
 # # test set 1
 # dataDir = '/mnt/biology/donaldson/tom/flower_map/data/Week3/6217East'
@@ -30,9 +36,12 @@ img_postfix = '.JPG'
 annFile = '/mnt/biology/donaldson/tom/flower_map_new/annotations/071121_centraleastern.json'
 endDir = '/mnt/biology/donaldson/tom/flower_map_new/annotations/20210711centralEastern_annotated'
 
+jsonDir = ''
+
+
 # Opening JSON file
 f = open(annFile)
- 
+
 # returns JSON object as
 # a dictionary
 data = json.load(f)
@@ -45,42 +54,93 @@ for class_l in data['categories']['label']['labels']:
         classes.update({class_counter: class_l['name']})
         class_counter+=1
 
-isClosed = True
-colors = [(255, 0, 0), (0, 255, 0)]
 
-print("AAAAAA", len(data['items']))
-for image in data['items']:
-    image_id = image['id']
-    image_path = dataDir+'/'+image_id+img_postfix
-    print(image_path)
-    image_cv2 = cv2.imread(image_path)
-    
-    if image_cv2.any():
-        for annotation in image['annotations']:
-            current_class = classes[annotation['id']]
-            current_polygon = np.array(annotation['points'])
-            current_polygon_2d = np.reshape(current_polygon, (int(len(current_polygon)/2),2))
+if OPTION == 'visualize':
 
-            # print(current_polygon_2d)
-            current_polygon_2d = current_polygon_2d.reshape((-1, 1, 2))
+    isClosed = True
+    colors = [(255, 0, 0), (0, 255, 0)]
 
-            current_species = np.array(annotation['label_id']) # species = 1 buckwheats, species = 2 whitesages
-            line_thickness = 2
-            cv2.polylines(image_cv2, np.int32([current_polygon_2d]), isClosed, colors[current_species], thickness=line_thickness)
-
-        # cv2.imshow("image.jpg", image_cv2)
-        print("ANNOTATED_"+image_id+'.JPG')
-        cv2.imwrite(endDir+"/ANNOTATED_"+image_id+'.JPG', image_cv2)
-    else:
-        print("ERROR_"+image_id+'.JPG')
-        with open(endDir+'errorLog.txt', 'a') as the_file:
-            the_file.write(image+'\n\n')
+    print("AAAAAA", len(data['items']))
+    for image in data['items']:
+        image_id = image['id']
+        image_path = dataDir+'/'+image_id+img_postfix
+        print(image_path)
+        image_cv2 = cv2.imread(image_path)
         
+        try:
+            test = image_cv2.any()
+            if not os.path.isfile(endDir+"/ANNOTATED_"+image_id+'.JPG'):
+                for annotation in image['annotations']:
+                    current_class = classes[annotation['id']]
+                    current_polygon = np.array(annotation['points'])
+                    current_polygon_2d = np.reshape(current_polygon, (int(len(current_polygon)/2),2))
 
+                    # print(current_polygon_2d)
+                    current_polygon_2d = current_polygon_2d.reshape((-1, 1, 2))
 
+                    current_species = np.array(annotation['label_id']) # species = 1 buckwheats, species = 2 whitesages
+                    line_thickness = 2
+                    cv2.polylines(image_cv2, np.int32([current_polygon_2d]), isClosed, colors[current_species], thickness=line_thickness)
 
+                # cv2.imshow("image.jpg", image_cv2)
+                print("ANNOTATED_"+image_id+'.JPG')
+                cv2.imwrite(endDir+"/ANNOTATED_"+image_id+'.JPG', image_cv2)
+            else:
+                print("Already exist: ANNOTATED_"+image_id+'.JPG')
+        except:
+            print("ERROR_"+image_id+'.JPG')
+            with open(endDir+'errorLog.txt', 'a') as the_file:
+                the_file.write(str(image)+'\n\n')
+        
+elif OPTION == 'json':
+    for image in data['items']:
+        image_id = image['id']
+        image_path = dataDir+'/'+image_id+img_postfix
+        print(image_path)
+        image_cv2 = cv2.imread(image_path)
+        
+        # initialize stuff for current image json dict
+        current_image_classes = []
+        current_plant_number = 0
+        current_label_id = 0
+        current_labels = []
+        try:
+            test = image_cv2.any()
+            if not os.path.isfile(endDir+"/ANNOTATED_"+image_id+'.JPG'):
+                for annotation in image['annotations']:
+                    # fetch info
+                    current_class = classes[annotation['id']]
+                    current_class = "ERFA" if current_species==1 else "SAAP"
+                    current_polygon = np.array(annotation['points'])
+                    current_polygon_2d = np.reshape(current_polygon, (int(len(current_polygon)/2),2))
+                    current_polygon_2d = np.transpose(current_polygon_2d)
+                    current_species = np.array(annotation['label_id']) # species = 1 buckwheats, species = 2 whitesages
 
+                    # update stuff for the current image json dict
+                    if current_class not in current_image_classes:
+                        current_image_classes.append(current_class)
+                    current_plant_number += 1
+                    current_label_id += 1
+                    current_labels.append[{
+                        "class": current_class,
+                        "id": current_label_id,
+                        "bbox_x": min(current_polygon_2d[0]),
+                        "width": max(current_polygon_2d[0])-min(current_polygon_2d[0]),
+                        "bbox_y": min(current_polygon_2d[1]),
+                        "height": max(current_polygon_2d[1])-min(current_polygon_2d[1]),
+                        "segment": list(current_polygon)
+                    }]
 
+            # generate a dict
+            current_img_dict = {
+                "classes": current_image_classes,
+                "number_of_plants": current_plant_number,
+                "labels": current_labels,
+                "sample_id": image_id
+            }
+            # get dict into a json file
+            with open('result.json', 'w') as fp:
+                json.dump(current_img_dict, endDir+'/'+image_id+'.json')
 
 
 
