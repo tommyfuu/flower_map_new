@@ -9,34 +9,63 @@ import time
 # visualize datasets of images with their annotations
 # generate individual json files usable for training mask r-cnn models
 
-OPTION = 'visualize' # either visualize or json
+OPTION = 'json' # either visualize or json
 
-
-# # test set 1
-# dataDir = '/mnt/biology/donaldson/tom/flower_map/data/Week3/6217East'
-# img_postfix = '.JPG'
-# annFile='/mnt/biology/donaldson/tom/flower_map_new/annotations/2017_6217east.json'
-# endDir = '/mnt/biology/donaldson/tom/flower_map_new/annotations/20176217east_annotated'
-
-# test set 2
-# dataDir = '/mnt/biology/donaldson/tom/flower_map/data/Week4/6617East2'
-# img_postfix = '.JPG'
-# annFile='/mnt/biology/donaldson/tom/flower_map_new/annotations/2017_6617east2.json'
-# endDir = '/mnt/biology/donaldson/tom/flower_map_new/annotations/20176617east2_annotated'
-
-# test set 3
+# test set - 1
 # dataDir = '/mnt/biology/donaldson/tom/flower_map_new/newData/070921_North'
 # img_postfix = '.JPG'
 # annFile = '/mnt/biology/donaldson/tom/flower_map_new/annotations/070921_north.json'
 # endDir = '/mnt/biology/donaldson/tom/flower_map_new/annotations/20210709north_annotated'
+# jsonDir = '/mnt/biology/donaldson/tom/flower_map_new/annotations/jsons_20210709_north'
 
-# test set 4
-dataDir = '/mnt/biology/donaldson/tom/flower_map_new/newData/071121_CentralEastern'
+# test set - 2
+# dataDir = '/mnt/biology/donaldson/tom/flower_map_new/newData/071121_CentralEastern'
+# img_postfix = '.JPG'
+# annFile = '/mnt/biology/donaldson/tom/flower_map_new/annotations/071121_centraleastern.json'
+# endDir = '/mnt/biology/donaldson/tom/flower_map_new/annotations/20210711centralEastern_annotated'
+# jsonDir = '/mnt/biology/donaldson/tom/flower_map_new/annotations/jsons_20210711_centralEastern'
+
+# # test set - 3
+# dataDir = '/mnt/biology/donaldson/tom/flower_map_new/newData/071621_South'
+# img_postfix = '.JPG'
+# annFile = '/mnt/biology/donaldson/tom/flower_map_new/annotations/071621_south.json'
+# endDir = '/mnt/biology/donaldson/tom/flower_map_new/annotations/20210716South_annotated'
+# jsonDir = '/mnt/biology/donaldson/tom/flower_map_new/annotations/jsons_20210716_south'
+
+# test set - 4
+# dataDir = '/mnt/biology/donaldson/tom/flower_map_new/newData/071121_Western'
+# img_postfix = '.JPG'
+# annFile = '/mnt/biology/donaldson/tom/flower_map_new/annotations/071121_western.json'
+# endDir = '/mnt/biology/donaldson/tom/flower_map_new/annotations/20210711Western_annotated'
+# jsonDir = '/mnt/biology/donaldson/tom/flower_map_new/annotations/jsons_20210711_western'
+
+# test set 2017 - 1
+# dataDir = '/mnt/biology/donaldson/tom/flower_map/data/Week3/6217East'
+# img_postfix = '.JPG'
+# annFile='/mnt/biology/donaldson/tom/flower_map_new/annotations/2017_6217east.json'
+# endDir = '/mnt/biology/donaldson/tom/flower_map_new/annotations/20176217east_annotated'
+# jsonDir = '/mnt/biology/donaldson/tom/flower_map_new/annotations/jsons_20176217_east'
+
+# test set -2017 -2
+# dataDir = '/mnt/biology/donaldson/tom/flower_map/data/Week3/6617East1'
+# img_postfix = '.JPG'
+# annFile='/mnt/biology/donaldson/tom/flower_map_new/annotations/2017_6617east1.json'
+# endDir = '/mnt/biology/donaldson/tom/flower_map_new/annotations/20176617east1_annotated'
+# jsonDir = '/mnt/biology/donaldson/tom/flower_map_new/annotations/jsons_20176617_east1'
+
+# test set -2017 -3
+# dataDir = '/mnt/biology/donaldson/tom/flower_map/data/Week4/6617East2'
+# img_postfix = '.JPG'
+# annFile='/mnt/biology/donaldson/tom/flower_map_new/annotations/2017_6617east2.json'
+# endDir = '/mnt/biology/donaldson/tom/flower_map_new/annotations/20176617east2_annotated'
+# jsonDir = '/mnt/biology/donaldson/tom/flower_map_new/annotations/jsons_20176617_east2'
+
+# test set -2017 -4
+dataDir = '/mnt/biology/donaldson/tom/flower_map/data/Week4/6917West'
 img_postfix = '.JPG'
-annFile = '/mnt/biology/donaldson/tom/flower_map_new/annotations/071121_centraleastern.json'
-endDir = '/mnt/biology/donaldson/tom/flower_map_new/annotations/20210711centralEastern_annotated'
-
-jsonDir = ''
+annFile='/mnt/biology/donaldson/tom/flower_map_new/annotations/2017_6917west.json'
+endDir = '/mnt/biology/donaldson/tom/flower_map_new/annotations/20176917west_annotated'
+jsonDir = '/mnt/biology/donaldson/tom/flower_map_new/annotations/jsons_20176917_west'
 
 
 # Opening JSON file
@@ -54,7 +83,7 @@ for class_l in data['categories']['label']['labels']:
         classes.update({class_counter: class_l['name']})
         class_counter+=1
 
-
+print(classes)
 if OPTION == 'visualize':
 
     isClosed = True
@@ -93,56 +122,60 @@ if OPTION == 'visualize':
                 the_file.write(str(image)+'\n\n')
         
 elif OPTION == 'json':
+    current_label_id = 0
     for image in data['items']:
         image_id = image['id']
         image_path = dataDir+'/'+image_id+img_postfix
         print(image_path)
-        image_cv2 = cv2.imread(image_path)
-        
         # initialize stuff for current image json dict
         current_image_classes = []
         current_plant_number = 0
-        current_label_id = 0
         current_labels = []
-        try:
-            test = image_cv2.any()
-            if not os.path.isfile(endDir+"/ANNOTATED_"+image_id+'.JPG'):
-                for annotation in image['annotations']:
-                    # fetch info
-                    current_class = classes[annotation['id']]
-                    current_class = "ERFA" if current_species==1 else "SAAP"
-                    current_polygon = np.array(annotation['points'])
-                    current_polygon_2d = np.reshape(current_polygon, (int(len(current_polygon)/2),2))
-                    current_polygon_2d = np.transpose(current_polygon_2d)
-                    current_species = np.array(annotation['label_id']) # species = 1 buckwheats, species = 2 whitesages
+        if not os.path.isfile(jsonDir+'/'+image_id+'.json'):
+            for annotation in image['annotations']:
+                # fetch info
+                current_class = classes[annotation['label_id']]
+                print(annotation['label_id'], current_class)
 
-                    # update stuff for the current image json dict
-                    if current_class not in current_image_classes:
-                        current_image_classes.append(current_class)
-                    current_plant_number += 1
-                    current_label_id += 1
-                    current_labels.append[{
-                        "class": current_class,
-                        "id": current_label_id,
-                        "bbox_x": min(current_polygon_2d[0]),
-                        "width": max(current_polygon_2d[0])-min(current_polygon_2d[0]),
-                        "bbox_y": min(current_polygon_2d[1]),
-                        "height": max(current_polygon_2d[1])-min(current_polygon_2d[1]),
-                        "segment": list(current_polygon)
-                    }]
+                current_polygon = np.array(annotation['points'])
+                current_polygon_2d = np.reshape(current_polygon, (int(len(current_polygon)/2),2))
+                current_polygon_2d = np.transpose(current_polygon_2d)
+                current_species = np.array(annotation['label_id']) # species = 1 buckwheats, species = 2 whitesages
 
-            # generate a dict
-            current_img_dict = {
-                "classes": current_image_classes,
-                "number_of_plants": current_plant_number,
-                "labels": current_labels,
-                "sample_id": image_id
-            }
-            # get dict into a json file
-            with open('result.json', 'w') as fp:
-                json.dump(current_img_dict, endDir+'/'+image_id+'.json')
+                # update stuff for the current image json dict
+                if current_class not in current_image_classes:
+                    current_image_classes.append(current_class)
+                current_plant_number += 1
+                current_label_id += 1
+                current_labels.append({
+                    "class": current_class,
+                    "id": current_label_id,
+                    "bbox_x": min(current_polygon_2d[0]),
+                    "width": max(current_polygon_2d[0])-min(current_polygon_2d[0]),
+                    "bbox_y": min(current_polygon_2d[1]),
+                    "height": max(current_polygon_2d[1])-min(current_polygon_2d[1]),
+                    "segment": list(current_polygon)
+                })
 
+        # generate a dict
+        current_img_dict = {
+            "classes": current_image_classes,
+            "number_of_plants": current_plant_number,
+            "labels": current_labels,
+            "sample_id": image_id
+        }
+        # get dict into a json file
+        out_file = open(jsonDir+'/'+image_id+'.json', "w")
 
+        json.dump(current_img_dict, out_file, indent = 6)
+        print('json generated')
+        # with open('result.json', 'w') as fp:
+        #     json.dump(current_img_dict, jsonDir+'/'+image_id+'.json')
+
+        # except:
+        #     print("ERROR_"+image_id+'.JPG')
+        #     with open(jsonDir+'errorLog.txt', 'a') as the_file:
+        #         the_file.write(str(image)+'\n\n')
 
 # coco=COCO(annFile)
 # annFile = '{}/annotations/person_keypoints_{}.json'.format(dataDir,dataType)
