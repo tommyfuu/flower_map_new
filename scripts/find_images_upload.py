@@ -75,12 +75,114 @@ def find_images(csv_summary_path, directory_path, output_txt_path, gDrive_path):
 #         '/mnt/biology/donaldson/tom/flower_map_new/useful_images_summaries/2017_6617East1_summary.txt',
 #         '"knuthXGDrive:/Bee Lab/Projects/Bee Forage Mapping/Bee Forage Mapping - Tom Thesis/dataToBeLabelled/2017_6617East1"')
 
-find_images('/mnt/biology/donaldson/tom/flower_map_new/2017_6617East2.csv',
-        '/mnt/biology/donaldson/tom/flower_map/data/Week4/6617East2',
-        '/mnt/biology/donaldson/tom/flower_map_new/useful_images_summaries/2017_6617East2_summary.txt',
-        '"knuthXGDrive:/Bee Lab/Projects/Bee Forage Mapping/Bee Forage Mapping - Tom Thesis/dataToBeLabelled/2017_6617East2"')
+# find_images('/mnt/biology/donaldson/tom/flower_map_new/2017_6617East2.csv',
+#         '/mnt/biology/donaldson/tom/flower_map/data/Week4/6617East2',
+#         '/mnt/biology/donaldson/tom/flower_map_new/useful_images_summaries/2017_6617East2_summary.txt',
+#         '"knuthXGDrive:/Bee Lab/Projects/Bee Forage Mapping/Bee Forage Mapping - Tom Thesis/dataToBeLabelled/2017_6617East2"')
 
 # find_images('/mnt/biology/donaldson/tom/flower_map_new/2017_6917West.csv',
 #         '/mnt/biology/donaldson/tom/flower_map/data/Week4/6917West',
 #         '/mnt/biology/donaldson/tom/flower_map_new/useful_images_summaries/2017_6917West_summary.txt',
 #         '"knuthXGDrive:/Bee Lab/Projects/Bee Forage Mapping/Bee Forage Mapping - Tom Thesis/dataToBeLabelled/2017_6917West"')
+
+
+def upload_jsons(json_folder, gDrive_path):
+      
+    process = 'rclone copy '+json_folder+" "+gDrive_path+" "+" -v"
+    print("prep finished, run the following command to upload all chosen images")
+    print(process)
+    # process = Popen(['rclone', 'copy', directory_path, gDrive_path, include_from, '-v'], stdout=PIPE, stderr=PIPE)
+    # stdout, stderr = process.communicate()
+    return
+
+# upload_jsons('/mnt/biology/donaldson/tom/flower_map_new/annotations/jsons_20176217_east', 
+#             '"knuthXGDrive:/Bee Lab/Projects/Bee Forage Mapping/Bee Forage Mapping - Tom Thesis/dataToBeLabelled/2017_6217East_json"')
+
+# find_images('/mnt/biology/donaldson/tom/flower_map_new/2017_6217East.csv',
+#         '/mnt/biology/donaldson/tom/flower_map/data/Week3/6217East',
+#         '/mnt/biology/donaldson/tom/flower_map_new/useful_images_summaries/2017_6217East_summary.txt',
+#         '"knuthXGDrive:/Bee Lab/Projects/Bee Forage Mapping/Bee Forage Mapping - Tom Thesis/dataToBeLabelled/2017_6217East_json"')
+
+# upload_jsons('/mnt/biology/donaldson/tom/flower_map_new/annotations/jsons_20176917_west', 
+#             '"knuthXGDrive:/Bee Lab/Projects/Bee Forage Mapping/Bee Forage Mapping - Tom Thesis/dataToBeLabelled/2017_6917West_json"')
+
+# find_images('/mnt/biology/donaldson/tom/flower_map_new/2017_6917West.csv',
+#         '/mnt/biology/donaldson/tom/flower_map/data/Week4/6917West',
+#         '/mnt/biology/donaldson/tom/flower_map_new/useful_images_summaries/2017_6917West_summary.txt',
+#         '"knuthXGDrive:/Bee Lab/Projects/Bee Forage Mapping/Bee Forage Mapping - Tom Thesis/dataToBeLabelled/2017_6917West_json"')
+
+
+
+
+#### Final Data Uploads
+
+# find_images('/mnt/biology/donaldson/tom/flower_map_new/070921_NorthHasPlants.csv',
+#         '/mnt/biology/donaldson/tom/flower_map_new/newData/070921_North',
+#         '/mnt/biology/donaldson/tom/flower_map_new/useful_images_summaries/0709_summary.txt',
+#         '"knuthXGDrive:/Bee Lab/Projects/Bee Forage Mapping/Bee Forage Mapping - Tom Thesis/labelled data/070921_North"')
+
+# upload_jsons('/mnt/biology/donaldson/tom/flower_map_new/annotations/jsons_20210709_north', 
+#             '"knuthXGDrive:/Bee Lab/Projects/Bee Forage Mapping/Bee Forage Mapping - Tom Thesis/labelled data/070921_North"')
+
+
+# find_images('/mnt/biology/donaldson/tom/flower_map_new/071121_CentralEasternHasPlants.csv',
+#         '/mnt/biology/donaldson/tom/flower_map_new/newData/071121_CentralEastern',
+#         '/mnt/biology/donaldson/tom/flower_map_new/useful_images_summaries/0711_CentralEastern_summary.txt',
+#         '"knuthXGDrive:/Bee Lab/Projects/Bee Forage Mapping/Bee Forage Mapping - Tom Thesis/labelled data/071121_CentralEastern"')
+
+# upload_jsons('/mnt/biology/donaldson/tom/flower_map_new/annotations/jsons_20210711_centralEastern', 
+#             '"knuthXGDrive:/Bee Lab/Projects/Bee Forage Mapping/Bee Forage Mapping - Tom Thesis/labelled data/071121_CentralEastern"')
+
+
+
+# find_images('/mnt/biology/donaldson/tom/flower_map_new/071621_South.csv',
+#         '/mnt/biology/donaldson/tom/flower_map_new/newData/071621_South',
+#         '/mnt/biology/donaldson/tom/flower_map_new/useful_images_summaries/071621_South_summary.txt',
+#         '"knuthXGDrive:/Bee Lab/Projects/Bee Forage Mapping/Bee Forage Mapping - Tom Thesis/labelled data/071621_South"')
+
+# upload_jsons('/mnt/biology/donaldson/tom/flower_map_new/annotations/jsons_20210716_south', 
+#             '"knuthXGDrive:/Bee Lab/Projects/Bee Forage Mapping/Bee Forage Mapping - Tom Thesis/labelled data/071621_South"')
+
+
+# find_images('/mnt/biology/donaldson/tom/flower_map_new/071121_Western.csv',
+#         '/mnt/biology/donaldson/tom/flower_map_new/newData/071121_Western',
+#         '/mnt/biology/donaldson/tom/flower_map_new/useful_images_summaries/071121_Western_summary.txt',
+#         '"knuthXGDrive:/Bee Lab/Projects/Bee Forage Mapping/Bee Forage Mapping - Tom Thesis/labelled data/071121_Western"')
+
+# upload_jsons('/mnt/biology/donaldson/tom/flower_map_new/annotations/jsons_20210711_western', 
+#             '"knuthXGDrive:/Bee Lab/Projects/Bee Forage Mapping/Bee Forage Mapping - Tom Thesis/labelled data/071121_Western"')
+
+find_images('/mnt/biology/donaldson/tom/flower_map_new/2017_6217East.csv',
+        '/mnt/biology/donaldson/tom/flower_map/data/Week3/6217East',
+        '/mnt/biology/donaldson/tom/flower_map_new/useful_images_summaries/2017_6217East_summary.txt',
+        '"knuthXGDrive:/Bee Lab/Projects/Bee Forage Mapping/Bee Forage Mapping - Tom Thesis/labelled data/2017_6217East"')
+
+
+upload_jsons('/mnt/biology/donaldson/tom/flower_map_new/annotations/jsons_20176217_east', 
+            '"knuthXGDrive:/Bee Lab/Projects/Bee Forage Mapping/Bee Forage Mapping - Tom Thesis/labelled data/2017_6217East"')
+
+# find_images('/mnt/biology/donaldson/tom/flower_map_new/2017_6617East1.csv',
+#         '/mnt/biology/donaldson/tom/flower_map/data/Week4/6617East1',
+#         '/mnt/biology/donaldson/tom/flower_map_new/useful_images_summaries/2017_6617East1_summary.txt',
+#         '"knuthXGDrive:/Bee Lab/Projects/Bee Forage Mapping/Bee Forage Mapping - Tom Thesis/labelled data/2017_6617East1"')
+
+# upload_jsons('/mnt/biology/donaldson/tom/flower_map_new/annotations/jsons_20176617_east1', 
+#             '"knuthXGDrive:/Bee Lab/Projects/Bee Forage Mapping/Bee Forage Mapping - Tom Thesis/labelled data/2017_6617East1"')
+
+# find_images('/mnt/biology/donaldson/tom/flower_map_new/2017_6617East2.csv',
+#         '/mnt/biology/donaldson/tom/flower_map/data/Week4/6617East2',
+#         '/mnt/biology/donaldson/tom/flower_map_new/useful_images_summaries/2017_6617East2_summary.txt',
+#         '"knuthXGDrive:/Bee Lab/Projects/Bee Forage Mapping/Bee Forage Mapping - Tom Thesis/labelled data/2017_6617East2"')
+
+# upload_jsons('/mnt/biology/donaldson/tom/flower_map_new/annotations/jsons_20176617_east2', 
+#             '"knuthXGDrive:/Bee Lab/Projects/Bee Forage Mapping/Bee Forage Mapping - Tom Thesis/labelled data/2017_6617East2"')
+
+
+# find_images('/mnt/biology/donaldson/tom/flower_map_new/2017_6917West.csv',
+#         '/mnt/biology/donaldson/tom/flower_map/data/Week4/6917West',
+#         '/mnt/biology/donaldson/tom/flower_map_new/useful_images_summaries/2017_6917West_summary.txt',
+#         '"knuthXGDrive:/Bee Lab/Projects/Bee Forage Mapping/Bee Forage Mapping - Tom Thesis/labelled data/2017_6917West"')
+
+# upload_jsons('/mnt/biology/donaldson/tom/flower_map_new/annotations/jsons_20176917_west', 
+#             '"knuthXGDrive:/Bee Lab/Projects/Bee Forage Mapping/Bee Forage Mapping - Tom Thesis/labelled data/2017_6917West"')
+

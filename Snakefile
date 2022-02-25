@@ -470,3 +470,5 @@ rule subset_images:
     conda: "envs/default.yml"
     shell:
         "scripts/subset_images.py {input.imageSourceInput} {input.extractImageOutput} {output}"
+
+rule evaluate_segmentation:

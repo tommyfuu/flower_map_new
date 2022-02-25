@@ -39,12 +39,27 @@ All chunks will be applied.
 The DEM will be generated in duplicated chunk: "chunk name"_DEM respectively
 Therefore, please avoid "_DEM" in your chunk name. Otherwise, it will not be processed.
 """
+
+
+# import os
+# os.environ['OPENBLAS_NUM_THREADS'] = '1'
+
+print("AAAAA")
+
 from pathlib import Path
+
+print("BBBB")
 from collections import Counter
+
+print("CCC")
 try:
     import Metashape as PhotoScan
+    print("DDD")
 except ImportError:
     import PhotoScan
+    print("D1")
+
+print("E")
 
 #######################################################
 # User variables
@@ -332,16 +347,16 @@ if __name__ == '__main__':
         help="the stitched orthomosaic, as a metashape project file (a psx file)"
     )
     args = parser.parse_args()
-
+    print("TOM: checkpoint 0")   
     if args.fast:
         Quality = PhotoScan.Quality.LowestQuality
         BlendingMode = PhotoScan.BlendingMode.DisabledBlending
 
     doc = create_doc(args.images, args.ext)
-
+    print("TOM: checkpoint 1")   
     # Initialising listing chunks
     chunk_list = doc.chunks
-        
+    print("TOM: checkpoint 2")   
     # Loop for all initial chunks
     for chunk in chunk_list:
         doc.chunk = chunk

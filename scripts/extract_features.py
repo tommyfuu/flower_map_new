@@ -20,6 +20,8 @@ from PIL import Image, ImageDraw
 
 NUM_FEATURES = 19
 Image.MAX_IMAGE_PIXELS = None # so that PIL doesn't complain when we open large files
+from PIL import ImageFile
+ImageFile.LOAD_TRUNCATED_IMAGES = True # TOM DEBUG:  so that PIL doesn't complain when we open large files
 
 # load the image
 img = Image.open(args.img).convert("RGB")

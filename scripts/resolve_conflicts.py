@@ -27,6 +27,7 @@ import numpy as np
 import pandas as pd
 import import_labelme
 from PIL import Image
+import tifffile as tiff
 # from matplotlib import pyplot as plt
 
 
@@ -58,7 +59,12 @@ def img_size(ortho=args.ortho):
     # note that this step is extremely memory inefficient!
     # it loads the entire image into memory just so that we can get the image size
     # TODO: improve memory usage here, perhaps by getting the image size from the segments.json file (in the imageData tag) or by using a different library that can determine image size without loading the image into memory
-    return np.asarray(Image.open(args.ortho)).shape[-2::-1]
+    #return np.asarray(Image.open(args.ortho)).shape[-2::-1]
+    image = tiff.TiffFile(ortho)
+    size = image.pages[0].shape[-2::-1]
+    image.close()
+    return size
+
 img_shape = img_size()
 
 # next, load the segments coords
@@ -95,6 +101,8 @@ areas_complete = pd.DataFrame.from_dict({
 # the areas_complete dataframe contains the sizes of each segment in the orthomosaic
 # while the areas dataframe contains the sizes within each image
 # so now we divide the two to get the fractional area of each segment in each image
+print(areas.shape)
+print(areas_complete.shape)
 areas = areas/areas_complete
 areas.columns = ['area']
 

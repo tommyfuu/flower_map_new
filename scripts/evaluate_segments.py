@@ -33,6 +33,7 @@ import numpy as np
 
 # test cases: fail before computation
 current_eval_type = str(args.eval)
+print(current_eval_type)
 if current_eval_type not in ['bbox', 'segm', 'both']:
     raise Exception('Please ensure that your eval type is \'bbox\' or \'segm\' or \'both\'.')
 
@@ -152,14 +153,10 @@ for idx, current_json_name in enumerate(glob(str(args.json) + '/*.json')):
             current_gt_segment = segment["segment"]
             current_gt_xs = [item for index, item in enumerate(current_gt_segment) if index%2==0]
             current_gt_ys = [item for index, item in enumerate(current_gt_segment) if index%2==1]
-            print("current_gt_xs", current_gt_xs)
-            print("current_gt_ys", current_gt_ys)
             current_gt_segment_area = PolyArea(current_gt_xs, current_gt_ys)
             current_gt_bbox = [segment["bbox_x"], segment["bbox_y"], segment["bbox_x"] + segment["width"], segment["bbox_y"] + segment["height"]],
             current_gt_image_id = current_image_name
-            
 
-            print("AAAAA", current_gt_segment)
             current_segment_dict = {
                 'area': current_gt_segment_area,
                 'bbox': current_gt_bbox[0],
@@ -168,6 +165,7 @@ for idx, current_json_name in enumerate(glob(str(args.json) + '/*.json')):
                 'image_id': current_image_name,
                 'segmentation': [current_gt_segment],
                 'iscrowd': 0,
+                'score': 0.5 # TODO: potential changes
             }
 
             gt_segment_id+=1
@@ -176,22 +174,38 @@ for idx, current_json_name in enumerate(glob(str(args.json) + '/*.json')):
             gt_coco_dict['annotations'].append(current_segment_dict)
 
 
-
 gtFile = open(str(args.out)+'_gt.json', "w")
-json.dump(gt_coco_dict, gtFile, indent = 6)
+with open(str(args.out)+'_gt.json', 'w') as gtFile:
+    json.dump(gt_coco_dict, gtFile, indent = 6)
+# gtFile_path = str(args.out)+'_gt.json'
+
+# resFile = str(args.out)+'_preds.json'
 predsFile = open(str(args.out)+'_preds.json', "w")
-json.dump(preds_coco_dict, predsFile, indent = 6)
+with open(str(args.out)+'_preds.json', 'w') as predsFile:
+    json.dump(gt_coco_dict, predsFile, indent = 6)
+# json.dump(preds_coco_dict, predsFile, indent = 6)
+# predsFile_path = str(args.out)+'_preds.json'
+
+import time
+import bz2
+time.sleep(2)
 
 from pycocotools.coco import COCO
 from pycocotools.cocoeval import COCOeval
 
 # conduct evaluation
-def eval_coco(annType, gtFile, predsFile, current_stats_file):
-    cocoGt = COCO(gtFile)
-    cocoDt = COCO(predsFile)
+def eval_coco(annType, annFile, resFile, current_stats_file):
+    print("annFile", annFile)
+    print("resFile", resFile)
+    cocoGt = COCO(annFile)
+    cocoDt = COCO(resFile)
+    print("confuzzled 1")
     cocoEval = COCOeval(cocoGt,cocoDt,annType)
+    print("confuzzled 2")
     cocoEval.evaluate()
+    print("confuzzled 3")
     cocoEval.accumulate()
+    print("confuzzled 4")
     cocoEval.summarize()
     current_stats = list(cocoEval.stats)
     current_stat_text = '\n' + 'evaluation stats - type '+annType + '\n'
@@ -199,28 +213,47 @@ def eval_coco(annType, gtFile, predsFile, current_stats_file):
     current_stat_text += 'ground truth source:' + str(args.gt) + '/*.json' + '\n'
     current_stat_text += 'prediction result source:' + str(args.json) + '/*.json' + '\n'
     current_stat_text += 'image source:' + str(args.images) + '\n'
-    current_stat_text += ' Average Precision  (AP) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = ' + current_stats[0] + '\n'
-    current_stat_text += ' Average Precision  (AP) @[ IoU=0.50      | area=   all | maxDets=100 ] = ' + current_stats[1] + '\n'
-    current_stat_text += ' Average Precision  (AP) @[ IoU=0.75      | area=   all | maxDets=100 ] = ' + current_stats[2] + '\n'
-    current_stat_text += ' Average Precision  (AP) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = ' + current_stats[3] + '\n'
-    current_stat_text += ' Average Precision  (AP) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = ' + current_stats[4] + '\n'
-    current_stat_text += ' Average Precision  (AP) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = ' + current_stats[5] + '\n'
-    current_stat_text += ' Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=  1 ] = ' + current_stats[6] + '\n'
-    current_stat_text += ' Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets= 10 ] = ' + current_stats[7] + '\n'
-    current_stat_text += ' Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = ' + current_stats[8] + '\n'
-    current_stat_text += ' Average Recall     (AR) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = ' + current_stats[9] + '\n'
-    current_stat_text += ' Average Recall     (AR) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = ' + current_stats[10] + '\n'
-    current_stat_text += ' Average Recall     (AR) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = ' + current_stats[11] + '\n'
+    current_stat_text += ' Average Precision  (AP) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = ' + str(current_stats[0]) + '\n'
+    current_stat_text += ' Average Precision  (AP) @[ IoU=0.50      | area=   all | maxDets=100 ] = ' + str(current_stats[1]) + '\n'
+    current_stat_text += ' Average Precision  (AP) @[ IoU=0.75      | area=   all | maxDets=100 ] = ' + str(current_stats[2]) + '\n'
+    current_stat_text += ' Average Precision  (AP) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = ' + str(current_stats[3]) + '\n'
+    current_stat_text += ' Average Precision  (AP) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = ' + str(current_stats[4]) + '\n'
+    current_stat_text += ' Average Precision  (AP) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = ' + str(current_stats[5]) + '\n'
+    current_stat_text += ' Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=  1 ] = ' + str(current_stats[6]) + '\n'
+    current_stat_text += ' Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets= 10 ] = ' + str(current_stats[7]) + '\n'
+    current_stat_text += ' Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = ' + str(current_stats[8]) + '\n'
+    current_stat_text += ' Average Recall     (AR) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = ' + str(current_stats[9]) + '\n'
+    current_stat_text += ' Average Recall     (AR) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = ' + str(current_stats[10]) + '\n'
+    current_stat_text += ' Average Recall     (AR) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = ' + str(current_stats[11]) + '\n'
     
 
     with open(current_stats_file, 'a') as f:
         f.write(current_stat_text)
     return
 
+print("evaluating")
 current_stats_file = str(args.out)+'_eval_stats.txt'
+annFile = str(args.out)+'_gt.json'
+resFile = str(args.out)+'_preds.json'
+# with open(str(args.out)+'_gt.json') as jsonfile:
+#     annFile = json.load(jsonfile)
+
+# with open(str(args.out)+'_preds.json') as jsonfile:
+#     resFile = json.load(jsonfile)
+
 if current_eval_type in ['segm','bbox']:
-    eval_coco(current_eval_type, gtFile, predsFile, current_stats_file)
+    print("AAA", current_eval_type)
+    # eval_coco(current_eval_type, annFile, resFile, current_stats_file)
+    eval_coco(current_eval_type, annFile, resFile, current_stats_file)
 elif current_eval_type == 'both':
-    eval_coco('bbox', gtFile, predsFile, current_stats_file)
-    eval_coco('segm', gtFile, predsFile, current_stats_file)
+    print("AAA", "Both")
+    eval_coco('bbox', annFile, resFile, current_stats_file)
+    eval_coco('segm', annFile, resFile, current_stats_file)
 print("evaluation done.")
+
+# cocoGt=COCO(gtFile_path)
+# cocoDt = COCO(predsFile_path)
+# cocoEval = COCOeval(cocoGt,cocoDt,annType)
+# cocoEval.evaluate()
+# cocoEval.accumulate()
+# cocoEval.summarize()
