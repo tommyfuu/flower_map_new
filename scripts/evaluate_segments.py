@@ -6,7 +6,10 @@ parser = argparse.ArgumentParser(
     description="Use AP metrics to evaluate the segmentation performance of a selected directory."
 )
 parser.add_argument(
-    "json", type=Path, help="the path to the folder that contain the coordinates of each extracted object for each image"
+    "eval", default = 'both' ,help="either 'bbox' or 'segm' or 'both', representing the type of image-based evaluation being carried out."
+)
+parser.add_argument(
+    "json", type=Path, help="the path to the folder that contain the coordinates of each extracted object for each image."
 )
 parser.add_argument(
     "gt", type=Path, help="the path to the folder/file that contain the coordinates of each ground truth object for each image"
@@ -15,7 +18,10 @@ parser.add_argument(
     "images", type=Path, help="the path to the folder that contain the images matching the annotation json files"
 )
 parser.add_argument(
-    "out", help="the path to the file containing AP segmentation evaluation performance"
+    "out", help="the path to the file containing the json files generated to match the formats of preds and ground truth, as well as the output stats file"
+)
+parser.add_argument(
+    "image_format", default = '.JPG', help="format of the images if not .JPG"
 )
 args = parser.parse_args()
 
@@ -23,6 +29,13 @@ import json
 from glob import glob
 from datetime import datetime,date
 import cv2
+import numpy as np 
+
+# test cases: fail before computation
+current_eval_type = str(args.eval)
+if current_eval_type not in ['bbox', 'segm', 'both']:
+    raise Exception('Please ensure that your eval type is \'bbox\' or \'segm\' or \'both\'.')
+
 
 # note that the feature based method is species-blind, 
 # so no need for two different species categories
@@ -73,24 +86,14 @@ def PolyArea(x,y):
 preds_segment_id = 1
 gt_segment_id = 1
 
-print("aaaa")
-print("args.json")
-print(args.json)
-print(str(args.json) + '/*.json')
 for idx, current_json_name in enumerate(glob(str(args.json) + '/*.json')):
-    current_image_name = current_json_name.split('/')[-1].split(".")[-2]+'.JPG'
-    print(current_image_name)
+    current_image_name = current_json_name.split('/')[-1].split(".")[-2]+str(args.image_format)
     current_image_path = str(args.images) + "/" + current_image_name
-    print(current_image_path)
     current_groundtruth_name = str(args.gt) + "/" + current_json_name.split('/')[-1]
-    print(current_groundtruth_name)
     if Path(current_json_name).is_file() and Path(current_groundtruth_name).is_file():
         with open(current_json_name) as f:
             preds_anns = json.load(f)
-        with open(current_groundtruth_name) as f:
-            gt_anns = json.load(f)
         
-        print("trying")
         # add images to the dicts
         height, width = cv2.imread(current_image_path).shape[:2]
         current_image_dict = {'file_name': current_image_name,
@@ -101,8 +104,6 @@ for idx, current_json_name in enumerate(glob(str(args.json) + '/*.json')):
                 }
         if current_image_name not in preds_coco_dict:
             preds_coco_dict['images'].append(current_image_dict)
-        if current_image_name not in gt_coco_dict:
-            gt_coco_dict['images'].append(current_image_dict)
 
         # adjust format for preds from watershed
         for segment in preds_anns['shapes']:
@@ -110,19 +111,20 @@ for idx, current_json_name in enumerate(glob(str(args.json) + '/*.json')):
             current_preds_segment = [[item for sublist in segment for item in sublist]]
             current_preds_xs = [item[0] for item in segment]
             current_preds_ys = [item[1] for item in segment]
-            print("???", max(current_preds_xs))
-            # current_preds_segment_area = PolyArea(current_preds_xs, current_preds_ys)
+            current_preds_segment_area = PolyArea(current_preds_xs, current_preds_ys)
             current_preds_bbox = [min(current_preds_xs), min(current_preds_ys),
              max(current_preds_xs)-min(current_preds_xs), max(current_preds_ys)-min(current_preds_ys)]
             current_preds_image_id = current_image_name
 
             current_segment_dict = {
-                # 'area': current_preds_segment_area,
+                'area': current_preds_segment_area,
                 'bbox': current_preds_bbox,
                 'category_id': 1,
                 'image_id': current_image_name,
                 'id': preds_segment_id,
-                'segmentation': current_preds_segment
+                'segmentation': current_preds_segment,
+                'iscrowd': 0,
+                'score': 0.5 # TODO: potential changes
             }
 
             preds_segment_id+=1
@@ -130,22 +132,42 @@ for idx, current_json_name in enumerate(glob(str(args.json) + '/*.json')):
             # append
             preds_coco_dict['annotations'].append(current_segment_dict)
 
+    if Path(current_groundtruth_name).is_file():
+        with open(current_groundtruth_name) as f:
+            gt_anns = json.load(f)
+
+        # add images to the dicts
+        height, width = cv2.imread(current_image_path).shape[:2]
+        current_image_dict = {'file_name': current_image_name,
+                'height': height,
+                'width': width,
+                'id': current_image_name,
+                'license': 1
+                }
+        if current_image_name not in gt_coco_dict:
+            gt_coco_dict['images'].append(current_image_dict)
+
         # adjust format for gt
         for segment in gt_anns['labels']:
-            current_gt_segment = [segment["segment"]]
-            # current_gt_xs = [item[0] for item in segment]
-            # current_gt_ys = [item[1] for item in segment]
-            # current_gt_segment_area = PolyArea(current_gt_xs, current_gt_ys)
+            current_gt_segment = segment["segment"]
+            current_gt_xs = [item for index, item in enumerate(current_gt_segment) if index%2==0]
+            current_gt_ys = [item for index, item in enumerate(current_gt_segment) if index%2==1]
+            print("current_gt_xs", current_gt_xs)
+            print("current_gt_ys", current_gt_ys)
+            current_gt_segment_area = PolyArea(current_gt_xs, current_gt_ys)
             current_gt_bbox = [segment["bbox_x"], segment["bbox_y"], segment["bbox_x"] + segment["width"], segment["bbox_y"] + segment["height"]],
             current_gt_image_id = current_image_name
+            
 
+            print("AAAAA", current_gt_segment)
             current_segment_dict = {
-                # 'area': current_gt_segment_area,
-                'bbox': current_gt_bbox,
+                'area': current_gt_segment_area,
+                'bbox': current_gt_bbox[0],
                 'category_id': 1,
                 'id': gt_segment_id,
                 'image_id': current_image_name,
-                'segmentation': current_gt_segment
+                'segmentation': [current_gt_segment],
+                'iscrowd': 0,
             }
 
             gt_segment_id+=1
@@ -153,92 +175,52 @@ for idx, current_json_name in enumerate(glob(str(args.json) + '/*.json')):
             # append
             gt_coco_dict['annotations'].append(current_segment_dict)
 
-out_file = open(str(args.out)+'_gt.json', "w")
-json.dump(gt_coco_dict, out_file, indent = 6)
-out_file = open(str(args.out)+'_preds.json', "w")
-json.dump(preds_coco_dict, out_file, indent = 6)
 
 
+gtFile = open(str(args.out)+'_gt.json', "w")
+json.dump(gt_coco_dict, gtFile, indent = 6)
+predsFile = open(str(args.out)+'_preds.json', "w")
+json.dump(preds_coco_dict, predsFile, indent = 6)
 
-# results = []
-# for image_id in image_ids:
-#     # Loop through detections
-#     for i in range(rois.shape[0]):
-#         class_id = class_ids[i]
-#         score = scores[i]
-#         bbox = np.around(rois[i], 1)
-#         mask = masks[:, :, i]
+from pycocotools.coco import COCO
+from pycocotools.cocoeval import COCOeval
 
-#         result = {
-#             "image_id": image_id,
-#             "category_id": dataset.get_source_class_id(class_id, "coco"),
-#             "bbox": [bbox[1], bbox[0], bbox[3] - bbox[1], bbox[2] - bbox[0]],
-#             "score": score,
-#             "segmentation": maskUtils.encode(np.asfortranarray(mask))
-#         }
-#         results.append(result)
-# return results
-# example_image = {u'coco_url': u'http://images.cocodataset.org/val2017/000000397133.jpg',
-#  u'date_captured': u'2013-11-14 17:02:52',
-#  u'file_name': u'000000397133.jpg',
-#  u'flickr_url': u'http://farm7.staticflickr.com/6116/6255196340_da26cf2c9e_z.jpg',
-#  u'height': 427,
-#  u'id': 397133,
-#  u'license': 4,
-#  u'width': 640}
+# conduct evaluation
+def eval_coco(annType, gtFile, predsFile, current_stats_file):
+    cocoGt = COCO(gtFile)
+    cocoDt = COCO(predsFile)
+    cocoEval = COCOeval(cocoGt,cocoDt,annType)
+    cocoEval.evaluate()
+    cocoEval.accumulate()
+    cocoEval.summarize()
+    current_stats = list(cocoEval.stats)
+    current_stat_text = '\n' + 'evaluation stats - type '+annType + '\n'
+    current_stat_text += current_time + '\n'
+    current_stat_text += 'ground truth source:' + str(args.gt) + '/*.json' + '\n'
+    current_stat_text += 'prediction result source:' + str(args.json) + '/*.json' + '\n'
+    current_stat_text += 'image source:' + str(args.images) + '\n'
+    current_stat_text += ' Average Precision  (AP) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = ' + current_stats[0] + '\n'
+    current_stat_text += ' Average Precision  (AP) @[ IoU=0.50      | area=   all | maxDets=100 ] = ' + current_stats[1] + '\n'
+    current_stat_text += ' Average Precision  (AP) @[ IoU=0.75      | area=   all | maxDets=100 ] = ' + current_stats[2] + '\n'
+    current_stat_text += ' Average Precision  (AP) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = ' + current_stats[3] + '\n'
+    current_stat_text += ' Average Precision  (AP) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = ' + current_stats[4] + '\n'
+    current_stat_text += ' Average Precision  (AP) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = ' + current_stats[5] + '\n'
+    current_stat_text += ' Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=  1 ] = ' + current_stats[6] + '\n'
+    current_stat_text += ' Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets= 10 ] = ' + current_stats[7] + '\n'
+    current_stat_text += ' Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = ' + current_stats[8] + '\n'
+    current_stat_text += ' Average Recall     (AR) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = ' + current_stats[9] + '\n'
+    current_stat_text += ' Average Recall     (AR) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = ' + current_stats[10] + '\n'
+    current_stat_text += ' Average Recall     (AR) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = ' + current_stats[11] + '\n'
+    
 
+    with open(current_stats_file, 'a') as f:
+        f.write(current_stat_text)
+    return
 
-# example_annotation = {u'area': 1481.3806499999994,
-#  u'bbox': [217.62, 240.54, 38.99, 57.75],
-#  u'category_id': 44,
-#  u'id': 82445,
-#  u'image_id': 397133,
-#  u'iscrowd': 0,
-#  u'segmentation': [[224.24,
-#    297.18,
-#    228.29,
-#    297.18,
-#    234.91,
-#    298.29,
-#    243.0,
-#    297.55,
-#    249.25,
-#    296.45,
-#    252.19,
-#    294.98,
-#    256.61,
-#    292.4,
-#    254.4,
-#    264.08,
-#    251.83,
-#    262.61,
-#    241.53,
-#    260.04,
-#    235.27,
-#    259.67,
-#    230.49,
-#    259.67,
-#    233.44,
-#    255.25,
-#    237.48,
-#    250.47,
-#    237.85,
-#    243.85,
-#    237.11,
-#    240.54,
-#    234.17,
-#    242.01,
-#    228.65,
-#    249.37,
-#    224.24,
-#    255.62,
-#    220.93,
-#    262.61,
-#    218.36,
-#    267.39,
-#    217.62,
-#    268.5,
-#    218.72,
-#    295.71,
-#    225.34,
-#    297.55]]}
+current_stats_file = str(args.out)+'_eval_stats.txt'
+if current_eval_type in ['segm','bbox']:
+    eval_coco(current_eval_type, gtFile, predsFile, current_stats_file)
+elif current_eval_type == 'both':
+    eval_coco('bbox', gtFile, predsFile, current_stats_file)
+    eval_coco('segm', gtFile, predsFile, current_stats_file)
+print("evaluation done.")
