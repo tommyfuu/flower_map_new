@@ -472,3 +472,16 @@ rule subset_images:
         "scripts/subset_images.py {input.imageSourceInput} {input.extractImageOutput} {output}"
 
 rule evaluate_segmentation:
+    """for evaluating image-level segmentation performance"""
+    input: 
+        evaluate_type = str(config['evaluate_type']),
+        gt_path = str(config['evaluate_gt']),
+        preds_path = rules.segment.output.high,
+        images_path = lambda wildcards: SAMP[wildcards.sample],
+    output:
+        config['out'        ]+"/{sample}/eval_segmentation"
+    conda: "envs/default.yml"
+    shell:
+        "scripts/evaluate_segments.py {input.evaluate_type} {input.gt_path} {input.preds_path} {input.images_path} {output}"
+
+    
