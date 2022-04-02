@@ -87,7 +87,7 @@ PARAMS = {
     }
 }
 
-
+name_img = str(args.image).split("/")[-1].split(".")[-2]
 def sliding_window(img, fnctn, size, num_features=1, skip=0):
     """
         run fnctn over each sliding, square window of width 2*size+1, skipping every skip pixel
@@ -115,6 +115,8 @@ def green_contrast(
 ):
     """ take a weighted average of the green and contrast values for each pixel """
     # normalize the weights, just in case they don't already add to 1
+    print("greeness", green.shape, green)
+    print("contrast", contrast.shape, contrast)
     total = green_weight + contrast_weight
     green_weight /= total
     contrast_weight /= total
@@ -165,15 +167,22 @@ else:
 
 # blur image to remove noise from grass
 print('blurring image to remove noise in the green and contrast values')
+print("texture.shape", texture.shape, texture)
 blur_green = cv.GaussianBlur(img, (PARAMS['blur']['green_kernel_size'],)*2, PARAMS['blur']['green_strength'])
 blur_contrast = cv.blur(texture[:,:,0], (PARAMS['blur']['contrast_kernel_size'],)*2)
 
 print('combining green and contrast values and removing more noise')
 combined = np.uint8(green_contrast(blur_green[:,:,1], blur_contrast) * 255)
+
+cv.imwrite('/mnt/biology/donaldson/tom/flower_map_new/newData/070921_North/'+name_img+'_original_segment_combined_.JPG', combined)
+
 combined = cv.fastNlMeansDenoising(
     combined, None, PARAMS['noise_removal']['strength'],
     PARAMS['noise_removal']['templateWindowSize'], PARAMS['noise_removal']['searchWindowSize']
 )
+
+cv.imwrite('/mnt/biology/donaldson/tom/flower_map_new/newData/070921_North/'+name_img+'_original_segment_combined_denoised.JPG', combined)
+
 
 print('performing greyscale morphological closing')
 combined = scipy.ndimage.grey_closing(combined, size=(PARAMS['morho']['big_kernel_size'],)*2)
@@ -214,6 +223,10 @@ opening_low = cv.morphologyEx(
 low = cv.morphologyEx(
     opening_low, cv.MORPH_CLOSE, small_kernel, iterations = PARAMS['morho']['low']['closing2']
 )
+
+cv.imwrite('/mnt/biology/donaldson/tom/flower_map_new/newData/070921_North/'+name_img+'_original_segment_high_.JPG', high)
+cv.imwrite('/mnt/biology/donaldson/tom/flower_map_new/newData/070921_North/'+name_img+'_original_segment_low_.JPG', low)
+
 
 # # uncomment this stuff for testing
 # plot_img(([

@@ -18,9 +18,6 @@ parser.add_argument(
     "image", help="a path to the image to segment"
 )
 parser.add_argument(
-    "cvat_path", type=Path, help="the path to the folder from cvat containing annotations and images."
-)
-parser.add_argument(
     "out_high", help="the path to a file in which to store the coordinates of each extracted high confidence object"
 )
 parser.add_argument(
@@ -69,13 +66,13 @@ PARAMS = {
         'contrast_kernel_size': 24 # potentially deletable
     },    
     'threshold': {
-        'block_size': 2001,
+        'block_size': 2003,
         'C': 10,
     },
     # Tom's addition:
     'num_of_features': {
-        'high': 4,
-        'low': 2
+        'high': 5,
+        'low': 4
     },
     # 'num_of_color_features': {
     #     'high': 3,
@@ -162,19 +159,14 @@ blur_energy = np.uint8(texture[:,:,3]*255/texture[:,:,3].max())
 blur_homogeneity = np.uint8(texture[:,:,2]*255)
 
 
-# blur_contrast = np.uint8(cv.blur(texture[:,:,0], (PARAMS['blur']['contrast_kernel_size'],)*2))
-# blur_correlation = np.uint8(cv.blur(texture[:,:,4], (PARAMS['blur']['contrast_kernel_size'],)*2)*255)
-# blur_energy = np.uint8(cv.blur(texture[:,:,3], (PARAMS['blur']['contrast_kernel_size'],)*2)*255)
-# blur_homogeneity = np.uint8(cv.blur(texture[:,:,2], (PARAMS['blur']['contrast_kernel_size'],)*2)*255)
-
-cv.imwrite('/mnt/biology/donaldson/tom/flower_map_new/newData/070921_North/'+name_img+'_blue_OG.JPG', blur_blue)
-cv.imwrite('/mnt/biology/donaldson/tom/flower_map_new/newData/070921_North/'+name_img+'_green_OG.JPG', blur_green)
-cv.imwrite('/mnt/biology/donaldson/tom/flower_map_new/newData/070921_North/'+name_img+'_red_OG.JPG', blur_red)
-cv.imwrite('/mnt/biology/donaldson/tom/flower_map_new/newData/070921_North/'+name_img+'_gradient_OG.JPG', blur_gradient)
-cv.imwrite('/mnt/biology/donaldson/tom/flower_map_new/newData/070921_North/'+name_img+'_contrast_OG.JPG', blur_contrast)
-cv.imwrite('/mnt/biology/donaldson/tom/flower_map_new/newData/070921_North/'+name_img+'_correlation_OG.JPG', blur_correlation)
-cv.imwrite('/mnt/biology/donaldson/tom/flower_map_new/newData/070921_North/'+name_img+'_energy_OG.JPG', blur_energy)
-cv.imwrite('/mnt/biology/donaldson/tom/flower_map_new/newData/070921_North/'+name_img+'_homogeneity_OG.JPG', blur_homogeneity)
+# cv.imwrite('/mnt/biology/donaldson/tom/flower_map_new/newData/070921_North/'+name_img+'_blue_OG.JPG', blur_blue)
+# cv.imwrite('/mnt/biology/donaldson/tom/flower_map_new/newData/070921_North/'+name_img+'_green_OG.JPG', blur_green)
+# cv.imwrite('/mnt/biology/donaldson/tom/flower_map_new/newData/070921_North/'+name_img+'_red_OG.JPG', blur_red)
+# cv.imwrite('/mnt/biology/donaldson/tom/flower_map_new/newData/070921_North/'+name_img+'_gradient_OG.JPG', blur_gradient)
+# cv.imwrite('/mnt/biology/donaldson/tom/flower_map_new/newData/070921_North/'+name_img+'_contrast_OG.JPG', blur_contrast)
+# cv.imwrite('/mnt/biology/donaldson/tom/flower_map_new/newData/070921_North/'+name_img+'_correlation_OG.JPG', blur_correlation)
+# cv.imwrite('/mnt/biology/donaldson/tom/flower_map_new/newData/070921_North/'+name_img+'_energy_OG.JPG', blur_energy)
+# cv.imwrite('/mnt/biology/donaldson/tom/flower_map_new/newData/070921_North/'+name_img+'_homogeneity_OG.JPG', blur_homogeneity)
 
 
 # 2. adaptive guassian thresholding
@@ -210,16 +202,31 @@ th_contrast_1 = th_contrast/255
 th_homogeneity_1 = th_homogeneity/255
 
 # sum_thresholds = th_blue_1+th_green_1+th_red_1+th_gradient_1+th_contrast_1+th_correlation_1+th_energy_1+th_homogeneity_1
-sum_thresholds = th_blue_1+th_green_1+th_red_1+th_gradient_1+th_contrast_1+th_homogeneity_1
+# sum_thresholds = th_blue_1+th_green_1+th_red_1+th_gradient_1+th_contrast_1+th_homogeneity_1
 
+PARAMS_DICT = {
+    "th_blue": 21.838007,
+    "th_green": 7.186267,
+    "th_red": 35.805404,
+    "th_gradient": 43.179289,
+    "th_contrast": 26.178679,
+    "th_homogeneity": 27.108396,
+}
+factor=1.0/sum(PARAMS_DICT.values())
+for k in PARAMS_DICT:
+  PARAMS_DICT[k] = PARAMS_DICT[k]*factor
 
+sum_thresholds = th_blue_1*PARAMS_DICT["th_blue"]+th_green_1*PARAMS_DICT["th_green"]+th_red_1*PARAMS_DICT["th_red"]+th_gradient_1*PARAMS_DICT["th_gradient"]+th_contrast_1*PARAMS_DICT["th_contrast"]+th_homogeneity_1*PARAMS_DICT["th_homogeneity"]
 
 print(np.unique(sum_thresholds))
 # according to the two hyperparameters, thresholding
 print('thresholding')
-thresh_high = (sum_thresholds > (PARAMS['num_of_features']['high'])) * np.uint8(255)
-# use a lower threshold to create the low confidence regions, so that they are larger
-thresh_low = (sum_thresholds > (PARAMS['num_of_features']['low'])) * np.uint8(255)
+# thresh_high = (sum_thresholds > (PARAMS['num_of_features']['high'])) * np.uint8(255)
+# # use a lower threshold to create the low confidence regions, so that they are larger
+# thresh_low = (sum_thresholds > (PARAMS['num_of_features']['low'])) * np.uint8(255)
+
+thresh_high = (sum_thresholds > (PARAMS['num_of_features']['high']/6)) * np.uint8(255)
+thresh_low = (sum_thresholds > (PARAMS['num_of_features']['low']/6)) * np.uint8(255)
 print(np.unique(thresh_high))
 print(np.unique(thresh_low))
 

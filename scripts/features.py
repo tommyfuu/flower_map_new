@@ -1,4 +1,7 @@
 #!/usr/bin/env python3
+import os
+os.environ['OPENBLAS_NUM_THREADS'] = '1' # to fix OpenBLAS blas_thread_init: pthread_create failed for thread 63 of 64: Resource temporarily unavailable
+
 import numpy as np
 from colorsys import *
 import matplotlib as mpl
@@ -128,6 +131,7 @@ def hsv(colors):
     r,g,b=colors
     return rgb_to_hsv(r/255., g/255., b/255.)
 
+
 def glcm(im, mask=None, offset=None, features=['contrast', 'dissimilarity', 'homogeneity', 'energy', 'correlation', 'ASM']):
     """Calculate the grey level co-occurrence matrices and output values for
     contrast, dissimilarity, homogeneity, energy, correlation, and ASM in a list"""
@@ -153,6 +157,7 @@ def glcm(im, mask=None, offset=None, features=['contrast', 'dissimilarity', 'hom
         if np.isnan(metric):
             metric = 0
         returns.append([metric])
+
     return np.concatenate(tuple(returns), 0) #concatenate into one list along axis 0 and return
 
 def colorMoment(im, mask):
