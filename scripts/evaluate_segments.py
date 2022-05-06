@@ -9,6 +9,9 @@ parser.add_argument(
     "eval", default = 'both' ,help="either 'bbox' or 'segm' or 'both', representing the type of image-based evaluation being carried out."
 )
 parser.add_argument(
+    "species", default = 'both' ,help="either 'SAAP' or 'ERFA' or 'both', representing the type of image-based evaluation being carried out."
+)
+parser.add_argument(
     "json", type=Path, help="the path to the folder that contain the coordinates of each extracted object for each image."
 )
 parser.add_argument(
@@ -21,7 +24,7 @@ parser.add_argument(
     "out", help="the path to the file containing the json files generated to match the formats of preds and ground truth, as well as the output stats file"
 )
 parser.add_argument(
-    "image_format", default = '.JPG', help="format of the images if not .JPG"
+    "image_format", help="example: .JPG. format of the input images."
 )
 args = parser.parse_args()
 
@@ -116,6 +119,7 @@ for idx, current_json_name in enumerate(glob(str(args.json) + '/*.json')):
             current_preds_bbox = [min(current_preds_xs), min(current_preds_ys),
              max(current_preds_xs)-min(current_preds_xs), max(current_preds_ys)-min(current_preds_ys)]
             current_preds_image_id = current_image_name
+            # current_species = segment["class"]
 
             current_segment_dict = {
                 'area': current_preds_segment_area,
@@ -125,7 +129,8 @@ for idx, current_json_name in enumerate(glob(str(args.json) + '/*.json')):
                 'id': preds_segment_id,
                 'segmentation': current_preds_segment,
                 'iscrowd': 0,
-                'score': 0.5 # TODO: potential changes
+                'score': 0.5, # TODO: potential changes
+                # 'species': current_species
             }
 
             preds_segment_id+=1
@@ -134,6 +139,7 @@ for idx, current_json_name in enumerate(glob(str(args.json) + '/*.json')):
             preds_coco_dict['annotations'].append(current_segment_dict)
 
     if Path(current_groundtruth_name).is_file():
+        print("gt file: ", current_groundtruth_name)
         with open(current_groundtruth_name) as f:
             gt_anns = json.load(f)
 
@@ -150,13 +156,14 @@ for idx, current_json_name in enumerate(glob(str(args.json) + '/*.json')):
 
         # adjust format for gt
         for segment in gt_anns['labels']:
+            
             current_gt_segment = segment["segment"]
             current_gt_xs = [item for index, item in enumerate(current_gt_segment) if index%2==0]
             current_gt_ys = [item for index, item in enumerate(current_gt_segment) if index%2==1]
             current_gt_segment_area = PolyArea(current_gt_xs, current_gt_ys)
             current_gt_bbox = [segment["bbox_x"], segment["bbox_y"], segment["bbox_x"] + segment["width"], segment["bbox_y"] + segment["height"]],
             current_gt_image_id = current_image_name
-
+            current_gt_species = segment["class"]
             current_segment_dict = {
                 'area': current_gt_segment_area,
                 'bbox': current_gt_bbox[0],
@@ -169,9 +176,12 @@ for idx, current_json_name in enumerate(glob(str(args.json) + '/*.json')):
             }
 
             gt_segment_id+=1
-
-            # append
-            gt_coco_dict['annotations'].append(current_segment_dict)
+            if current_gt_species == "SAAP" and str(args.species) == "SAAP":
+                gt_coco_dict['annotations'].append(current_segment_dict)
+            elif current_gt_species == "ERFA" and str(args.species) == "ERFA":
+                gt_coco_dict['annotations'].append(current_segment_dict)
+            elif str(args.species) == "both":
+                gt_coco_dict['annotations'].append(current_segment_dict)
 
 
 gtFile = open(str(args.out)+'_gt.json', "w")
@@ -182,7 +192,7 @@ with open(str(args.out)+'_gt.json', 'w') as gtFile:
 # resFile = str(args.out)+'_preds.json'
 predsFile = open(str(args.out)+'_preds.json', "w")
 with open(str(args.out)+'_preds.json', 'w') as predsFile:
-    json.dump(gt_coco_dict, predsFile, indent = 6)
+    json.dump(preds_coco_dict, predsFile, indent = 6)
 # json.dump(preds_coco_dict, predsFile, indent = 6)
 # predsFile_path = str(args.out)+'_preds.json'
 

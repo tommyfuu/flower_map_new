@@ -17,7 +17,7 @@ parser.add_argument(
     "out", help="the path to the file containing the json files generated to match the formats of preds and ground truth, as well as the output stats file"
 )
 parser.add_argument(
-    "texture_cache", type=Path, help=
+    "--texture-cache", type=Path, help=
     """
         The path to an npy file containing the texture of the image if already calculated.
         (Providing this option can speed up repeated executions of this script on the same input.)
@@ -36,7 +36,7 @@ import matplotlib.pyplot as plt
 import pylab
 import json
 import cv2 as cv
-
+print("AAAAA", args.texture_cache)
 # CONSTANTS
 PARAMS = {
     'texture': {
@@ -205,6 +205,7 @@ def get_single_binaryImg(json_path,img_path,binary_img_save):
             # name_img = str(args.image).split("/")[-1].split(".")[-2]
 
             gray = cv.cvtColor(img, cv.COLOR_BGR2GRAY)
+            print("TEXTURE_CACHE", args.texture_cache)
             if args.texture_cache is not None:
                 texture_cache = str(args.texture_cache) + '/' + name_img + '.npy'
                 if Path(texture_cache).exists():
@@ -235,28 +236,43 @@ def get_single_binaryImg(json_path,img_path,binary_img_save):
 
             # 2. adaptive guassian thresholding
             ### TODO: as of 3/1 night the only feature that doesn't work at all is correlation.
-            th_blue = 255- cv.adaptiveThreshold(blur_blue,255,cv.ADAPTIVE_THRESH_GAUSSIAN_C,\
-                        cv.THRESH_BINARY,PARAMS['threshold']['block_size'],PARAMS['threshold']['C'])
-            th_green = 255- cv.adaptiveThreshold(blur_green,255,cv.ADAPTIVE_THRESH_GAUSSIAN_C,\
-                        cv.THRESH_BINARY,PARAMS['threshold']['block_size'],PARAMS['threshold']['C'])
-            th_red = 255- cv.adaptiveThreshold(blur_red,255,cv.ADAPTIVE_THRESH_GAUSSIAN_C,\
-                        cv.THRESH_BINARY,PARAMS['threshold']['block_size'],PARAMS['threshold']['C'])
-            th_gradient = 255- cv.adaptiveThreshold(blur_gradient,255,cv.ADAPTIVE_THRESH_GAUSSIAN_C,\
-                        cv.THRESH_BINARY,PARAMS['threshold']['block_size'],PARAMS['threshold']['C'])
-            th_contrast = 255 - cv.adaptiveThreshold(blur_contrast,255,cv.ADAPTIVE_THRESH_GAUSSIAN_C,\
-                        cv.THRESH_BINARY,PARAMS['threshold']['block_size'],PARAMS['threshold']['C'])
-            th_homogeneity = 255- cv.adaptiveThreshold(blur_homogeneity,255,cv.ADAPTIVE_THRESH_GAUSSIAN_C,\
-                        cv.THRESH_BINARY,PARAMS['threshold']['block_size'],PARAMS['threshold']['C'])
+            # th_blue = 255- cv.adaptiveThreshold(blur_blue,255,cv.ADAPTIVE_THRESH_GAUSSIAN_C,\
+            #             cv.THRESH_BINARY,PARAMS['threshold']['block_size'],PARAMS['threshold']['C'])
+            # th_green = 255- cv.adaptiveThreshold(blur_green,255,cv.ADAPTIVE_THRESH_GAUSSIAN_C,\
+            #             cv.THRESH_BINARY,PARAMS['threshold']['block_size'],PARAMS['threshold']['C'])
+            # th_red = 255- cv.adaptiveThreshold(blur_red,255,cv.ADAPTIVE_THRESH_GAUSSIAN_C,\
+            #             cv.THRESH_BINARY,PARAMS['threshold']['block_size'],PARAMS['threshold']['C'])
+            # th_gradient = 255- cv.adaptiveThreshold(blur_gradient,255,cv.ADAPTIVE_THRESH_GAUSSIAN_C,\
+            #             cv.THRESH_BINARY,PARAMS['threshold']['block_size'],PARAMS['threshold']['C'])
+            # th_contrast = 255 - cv.adaptiveThreshold(blur_contrast,255,cv.ADAPTIVE_THRESH_GAUSSIAN_C,\
+            #             cv.THRESH_BINARY,PARAMS['threshold']['block_size'],PARAMS['threshold']['C'])
+            # th_homogeneity = 255- cv.adaptiveThreshold(blur_homogeneity,255,cv.ADAPTIVE_THRESH_GAUSSIAN_C,\
+            #             cv.THRESH_BINARY,PARAMS['threshold']['block_size'],PARAMS['threshold']['C'])
+
+            th_blue = blur_blue
+            th_green = blur_green
+            th_red = blur_red
+            th_gradient = blur_gradient
+            th_contrast = blur_contrast
+            th_homogeneity = blur_homogeneity
 
             th_blue_1 = (th_blue/255).flatten()
             th_green_1 = (th_green/255).flatten()
             th_red_1 = (th_red/255).flatten()
             th_gradient_1 = (th_gradient/255).flatten()
             th_contrast_1 = (th_contrast/255).flatten()
-            # th_correlation_1 = th_correlation/255
-            # th_energy_1 = th_energy/255
             th_homogeneity_1 = (th_homogeneity/255).flatten()
 
+
+            th_blue_1 = np.around(th_blue_1, decimals=3)
+            th_green_1 = np.around(th_green_1, decimals=3)
+            th_red_1 = np.around(th_red_1, decimals=3)
+            th_gradient_1 = np.around(th_gradient_1, decimals=3)
+            th_contrast_1 = np.around(th_contrast_1, decimals=3)
+            th_homogeneity_1 = np.around(th_homogeneity_1, decimals=3)
+            # th_correlation_1 = th_correlation/255
+            # th_energy_1 = th_energy/255
+            
             features_np = np.stack((th_blue_1, th_green_1, th_red_1, th_gradient_1, th_contrast_1, th_homogeneity_1)).T
             
             if exog_df is None:
@@ -275,10 +291,19 @@ binary_img_save = str(args.cvat_path)+'/binary_images'
 Path(binary_img_save).mkdir(parents=True, exist_ok=True)
 endog_df, exog_df = get_single_binaryImg(json_path, img_path, binary_img_save)
 
+endog_df = endog_df.sample(frac=0.0001, replace=False, random_state=1)
+exog_df = endog_df[endog_df.index]
 # train glm
 
-glm_binom = sm.GLM(endog_df, exog_df) # use the default gauassian family
+glm_binom = sm.GLM(endog_df, exog_df, family=sm.families.Binomial()) # use the default gauassian family
 res = glm_binom.fit()
 print(res.summary())
 print("PARAMS")
 print(res.params)
+
+with open(str(args.out)+'/glm_model_summary_1.txt', 'w') as f:
+    f.write(str(res.summary()))
+
+with open(str(args.out)+'/glm_model_params_1.txt', 'w') as f:
+    f.write("PARAMS\n")
+    f.write(str(res.params))
