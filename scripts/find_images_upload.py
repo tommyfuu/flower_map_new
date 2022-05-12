@@ -1,6 +1,36 @@
+#!/usr/bin/env python3
+import argparse
+from pathlib import Path
 import pandas as pd
 from subprocess import Popen, PIPE
+# find_images('/mnt/biology/donaldson/tom/flower_map_new/2017_6217East.csv',
+#         '/mnt/biology/donaldson/tom/flower_map/data/Week3/6217East',
+#         '/mnt/biology/donaldson/tom/flower_map_new/useful_images_summaries/2017_6217East_summary.txt',
+#         '"knuthXGDrive:/Bee Lab/Projects/Bee Forage Mapping/Bee Forage Mapping - Tom Thesis/labelled data/2017_6217East"')
 
+
+# upload_jsons('/mnt/biology/donaldson/tom/flower_map_new/annotations/jsons_20176217_east', 
+#             '"knuthXGDrive:/Bee Lab/Projects/Bee Forage Mapping/Bee Forage Mapping - Tom Thesis/labelled data/2017_6217East"')
+
+parser = argparse.ArgumentParser(
+    description="find images and upload to google drive")
+)
+parser.add_argument(
+    "image_range", help="path to the csv file defining the range of images to be uploaded. example seen at /mnt/biology/donaldson/tom/flower_map_new/2017_6217East.csv.")
+)
+parser.add_argument(
+    "image_dir", help="path to the directory of images to be selected from. example seen at /mnt/biology/donaldson/tom/flower_map/data/Week3/6217East.")
+)
+parser.add_argument(
+    "output_txt_path", help="path to the file you want to include all the names of the files you are uploading. example seen at '/mnt/biology/donaldson/tom/flower_map_new/useful_images_summaries/2017_6217East_summary.txt'.")
+)
+parser.add_argument(
+    "jsons_path", help="path to the json files to be uploaded. example seen at: /mnt/biology/donaldson/tom/flower_map_new/annotations/jsons_20176217_east.")
+)
+parser.add_argument(
+    "gdrive_path", help="path to upload the files to.")
+)
+args = parser.parse_args()
 
 def find_images(csv_summary_path, directory_path, output_txt_path, gDrive_path):
     a = pd.read_csv(csv_summary_path)
@@ -43,6 +73,8 @@ def find_images(csv_summary_path, directory_path, output_txt_path, gDrive_path):
     # process = Popen(['rclone', 'copy', directory_path, gDrive_path, include_from, '-v'], stdout=PIPE, stderr=PIPE)
     # stdout, stderr = process.communicate()
     return all_contained_image_names
+
+
 
 # find_images('/mnt/biology/donaldson/tom/flower_map_new/070921_NorthHasPlants.csv',
 #         '/mnt/biology/donaldson/tom/flower_map_new/newData/070921_North',
@@ -152,14 +184,14 @@ def upload_jsons(json_folder, gDrive_path):
 # upload_jsons('/mnt/biology/donaldson/tom/flower_map_new/annotations/jsons_20210711_western', 
 #             '"knuthXGDrive:/Bee Lab/Projects/Bee Forage Mapping/Bee Forage Mapping - Tom Thesis/labelled data/071121_Western"')
 
-find_images('/mnt/biology/donaldson/tom/flower_map_new/2017_6217East.csv',
-        '/mnt/biology/donaldson/tom/flower_map/data/Week3/6217East',
-        '/mnt/biology/donaldson/tom/flower_map_new/useful_images_summaries/2017_6217East_summary.txt',
-        '"knuthXGDrive:/Bee Lab/Projects/Bee Forage Mapping/Bee Forage Mapping - Tom Thesis/labelled data/2017_6217East"')
+# find_images('/mnt/biology/donaldson/tom/flower_map_new/2017_6217East.csv',
+#         '/mnt/biology/donaldson/tom/flower_map/data/Week3/6217East',
+#         '/mnt/biology/donaldson/tom/flower_map_new/useful_images_summaries/2017_6217East_summary.txt',
+#         '"knuthXGDrive:/Bee Lab/Projects/Bee Forage Mapping/Bee Forage Mapping - Tom Thesis/labelled data/2017_6217East"')
 
 
-upload_jsons('/mnt/biology/donaldson/tom/flower_map_new/annotations/jsons_20176217_east', 
-            '"knuthXGDrive:/Bee Lab/Projects/Bee Forage Mapping/Bee Forage Mapping - Tom Thesis/labelled data/2017_6217East"')
+# upload_jsons('/mnt/biology/donaldson/tom/flower_map_new/annotations/jsons_20176217_east', 
+#             '"knuthXGDrive:/Bee Lab/Projects/Bee Forage Mapping/Bee Forage Mapping - Tom Thesis/labelled data/2017_6217East"')
 
 # find_images('/mnt/biology/donaldson/tom/flower_map_new/2017_6617East1.csv',
 #         '/mnt/biology/donaldson/tom/flower_map/data/Week4/6617East1',
@@ -186,3 +218,6 @@ upload_jsons('/mnt/biology/donaldson/tom/flower_map_new/annotations/jsons_201762
 # upload_jsons('/mnt/biology/donaldson/tom/flower_map_new/annotations/jsons_20176917_west', 
 #             '"knuthXGDrive:/Bee Lab/Projects/Bee Forage Mapping/Bee Forage Mapping - Tom Thesis/labelled data/2017_6917West"')
 
+if __name__ == "__main__":
+    find_images(args.image_range, args.image_dir, args.output_txt_path, args.gdrive_path)
+    upload_jsons(args.jsons_path, args.gdrive_path)
