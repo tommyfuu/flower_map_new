@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 import argparse
 from pathlib import Path
-
+import time
+start_time = time.time()
 parser = argparse.ArgumentParser(
     description=
     """
@@ -22,7 +23,7 @@ parser.add_argument(
     "out_low", help="the path to a file in which to store the coordinates of each extracted low confidence object"
 )
 parser.add_argument(
-    "--texture-cache", type=Path, help=
+    "--texture_cache", type=Path, help=
     """
         The path to an npy file containing the texture of the image if already calculated.
         (Providing this option can speed up repeated executions of this script on the same input.)
@@ -192,6 +193,11 @@ thresh_high = (combined > (PARAMS['threshold']['high'] * 255)) * np.uint8(255)
 # use a lower threshold to create the low confidence regions, so that they are larger
 thresh_low = (combined > (PARAMS['threshold']['low'] * 255)) * np.uint8(255)
 
+cv.imwrite('/mnt/biology/donaldson/tom/flower_map_new/out/070921_North/og_segment_stuff/'+name_img+'high_og.jpg', thresh_high)
+cv.imwrite('/mnt/biology/donaldson/tom/flower_map_new/out/070921_North/og_segment_stuff/'+name_img+'low_og.jpg', thresh_low)
+
+
+
 # noise removal
 print('performing morphological operations and hole filling')
 # first, create the kernels we use in the morpho operations
@@ -227,14 +233,10 @@ low = cv.morphologyEx(
 cv.imwrite('/mnt/biology/donaldson/tom/flower_map_new/newData/070921_North/'+name_img+'_original_segment_high_.JPG', high)
 cv.imwrite('/mnt/biology/donaldson/tom/flower_map_new/newData/070921_North/'+name_img+'_original_segment_low_.JPG', low)
 
-
-# # uncomment this stuff for testing
-# plot_img(([
-#     img, thresh_high, closing_high, high,
-#     low, thresh_low, closing_low, opening_low
-# ], 2, 4), close=True)
-
 # save the resulting masks to files
 print('writing resulting masks to output files')
 export_results(high, args.out_high)
 export_results(low, args.out_low)
+
+
+print("My program took", time.time() - start_time, "to run")

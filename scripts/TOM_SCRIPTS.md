@@ -95,9 +95,26 @@ example:
 ```
 python scripts/otsu_binarization.py /mnt/biology/donaldson/tom/flower_map_new/newData/070921_North/100_0007_0005.JPG /mnt/biology/donaldson/tom/flower_map_new/out/070921_North/segment_trash/100_0007_0005_trial.json
 ```
-### run_all_multifeature_thred.py
+### run_all_multifeature_thred.py TODO
 
 ### segment.py
+
+```
+python segment.py (--texture-cache TEXTURE_CACHE_FILE) image  out_high out_low
+```
+
+depending on whether you use the texture-cache (if you run the original pipeline, this texture cache should be available)
+
+if you have the texture-cache 
+
+```
+python segment.py  --texture-cache /mnt/biology/donaldson/tom/flower_map_new/out/070921_North/segments/texture/100_0007_0002.npy /mnt/biology/donaldson/tom/flower_map_new/newData/070921_North/100_0007_0002.JPG /mnt/biology/donaldson/tom/flower_map_new/out/070921_North/segments/high/100_0007_0002_trial.json /mnt/biology/donaldson/tom/flower_map_new/out/070921_North/segments/low/100_0007_0002_trial.json
+```
+
+if you do NOT have the texture-cache
+```
+python segment.py  /mnt/biology/donaldson/tom/flower_map_new/newData/070921_North/100_0007_0002.JPG /mnt/biology/donaldson/tom/flower_map_new/out/070921_North/segments/high/100_0007_0002_trial.json /mnt/biology/donaldson/tom/flower_map_new/out/070921_North/segments/low/100_0007_0002_trial.json```
+```
 
 ### visualizePolygons.py
 
