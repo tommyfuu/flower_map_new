@@ -13,11 +13,7 @@ start_time = time.time()
 parser = argparse.ArgumentParser(
     description=
     """
-        Segment the image into objects and output both 1) contours which we are
-        highly confident have plants and 2) contours which we have less
-        confidence contain plants (where the contours from #1 are contained
-        within the regions outlined by #2). You can run watershed.py with #1 and
-        #2 to get the resulting contours.
+        otsu binarization
     """
 )
 parser.add_argument(
