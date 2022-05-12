@@ -87,7 +87,14 @@ python multi_feature_segment.py  /mnt/biology/donaldson/tom/flower_map_new/newDa
 
 ### otsu_binarization.py
 
+```
+python otsu_binarization.py image out
+```
 
+example:
+```
+python scripts/otsu_binarization.py /mnt/biology/donaldson/tom/flower_map_new/newData/070921_North/100_0007_0005.JPG /mnt/biology/donaldson/tom/flower_map_new/out/070921_North/segment_trash/100_0007_0005_trial.json
+```
 ### run_all_multifeature_thred.py
 
 ### segment.py
