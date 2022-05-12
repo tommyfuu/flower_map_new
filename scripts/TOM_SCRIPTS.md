@@ -14,7 +14,7 @@ It might take a while to run it because there are a lot of dependencies to insta
 Make sure you activate the conda environment before you run the scripts.
 
 ## script manuals
-
+ssss
 ### countAnnotations.py
 
 This script enables a user to count how many annotations of each species there are in each of the annotation json file in the format shown in `/mnt/biology/donaldson/tom/flower_map_new/annotations/2017_6217east.json`. It takes as the input a directory containing all such annotation json files you are interested in.
