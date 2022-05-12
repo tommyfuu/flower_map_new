@@ -149,27 +149,3 @@ elif OPTION == 'json' or 'BOTH':
 
         json.dump(current_img_dict, out_file, indent = 6)
         print('json generated')
-        # with open('result.json', 'w') as fp:
-        #     json.dump(current_img_dict, jsonDir+'/'+image_id+'.json')
-
-        # except:
-        #     print("ERROR_"+image_id+'.JPG')
-        #     with open(jsonDir+'errorLog.txt', 'a') as the_file:
-        #         the_file.write(str(image)+'\n\n')
-
-# coco=COCO(annFile)
-# annFile = '{}/annotations/person_keypoints_{}.json'.format(dataDir,dataType)
-# coco_kps=COCO(annFile)
-
-
-# catIds = coco.getCatIds(catNms=['person'])
-# imgIds = coco.getImgIds(catIds=catIds );
-# imgIds = coco.getImgIds(imgIds = imgIds[0])
-# img = coco.loadImgs(imgIds[np.random.randint(0,len(imgIds))])[0]
-# I = io.imread(dataDir+'/images/default/'+img['file_name'])
-
-# plt.imshow(I); plt.axis('off')
-# annIds = coco.getAnnIds(imgIds=img['id'], catIds=catIds, iscrowd=None)
-# anns = coco.loadAnns(annIds)
-# coco.showAnns(anns)
-

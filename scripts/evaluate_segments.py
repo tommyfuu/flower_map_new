@@ -37,6 +37,7 @@ import numpy as np
 # test cases: fail before computation
 current_eval_type = str(args.eval)
 print(current_eval_type)
+# male sure evaluation type is of a defined type
 if current_eval_type not in ['bbox', 'segm', 'both']:
     raise Exception('Please ensure that your eval type is \'bbox\' or \'segm\' or \'both\'.')
 
@@ -59,9 +60,7 @@ preds_coco_dict = {
                 'name': 'Attribution-NonCommercial License',
                 'url': 'http://creativecommons.org/licenses/by-nc/2.0/'}],
     'categories': [{'id': 1, 'name': 'any', 'supercategory': 'any'}],
-    # 'categories': [{'id': 1, 'name': 'SAAS', 'supercategory': 'SAAS'}, 
-    #                 {'id': 2, 'name': 'ERFA', 'supercategory': 'ERFA'}]
-}
+    }
 
 gt_coco_dict = {
     'info': {
@@ -84,12 +83,13 @@ gt_coco_dict = {
 }
 
 def PolyArea(x,y):
-    "source: https://stackoverflow.com/questions/24467972/calculate-area-of-polygon-given-x-y-coordinates"
+    "method to calculate the area of a polygon (contour), source: https://stackoverflow.com/questions/24467972/calculate-area-of-polygon-given-x-y-coordinates"
     return 0.5*np.abs(np.dot(x,np.roll(y,1))-np.dot(y,np.roll(x,1)))
 
 preds_segment_id = 1
 gt_segment_id = 1
 
+# get the prediction dictionary
 for idx, current_json_name in enumerate(glob(str(args.json) + '/*.json')):
     current_image_name = current_json_name.split('/')[-1].split(".")[-2]+str(args.image_format)
     current_image_path = str(args.images) + "/" + current_image_name
@@ -130,7 +130,6 @@ for idx, current_json_name in enumerate(glob(str(args.json) + '/*.json')):
                 'segmentation': current_preds_segment,
                 'iscrowd': 0,
                 'score': 0.5, # TODO: potential changes
-                # 'species': current_species
             }
 
             preds_segment_id+=1
@@ -138,6 +137,7 @@ for idx, current_json_name in enumerate(glob(str(args.json) + '/*.json')):
             # append
             preds_coco_dict['annotations'].append(current_segment_dict)
 
+    # get the ground truth dictionary
     if Path(current_groundtruth_name).is_file():
         print("gt file: ", current_groundtruth_name)
         with open(current_groundtruth_name) as f:

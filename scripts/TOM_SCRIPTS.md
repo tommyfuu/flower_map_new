@@ -118,6 +118,19 @@ python segment.py  /mnt/biology/donaldson/tom/flower_map_new/newData/070921_Nort
 
 ### visualizePolygons.py
 
+```
+python visualizePolygons.py dataDir img_postfix annFile endDir jsonDir option
+```
+example:
+```
+python visualizePolygons.py /mnt/biology/donaldson/tom/flower_map_new/newData/070921_North .JPG /mnt/biology/donaldson/tom/flower_map_new/annotations/070921_north.json /mnt/biology/donaldson/tom/flower_map_new/annotations_wspecies/20210709north_annotated /mnt/biology/donaldson/tom/flower_map_new/annotations_wspecies/jsons_20210709_north both
+```
+
 ### watershed_single_image.py
 
+
+```
+python watershed_single_image.py /mnt/biology/donaldson/tom/flower_map_new/newData/070921_North/100_0007_0002.JPG /mnt/biology/donaldson/tom/flower_map_new/out/070921_North/segments/high/100_0007_0002.json /mnt/biology/donaldson/tom/flower_map_new/out/070921_North/segments/low/100_0007_0002.json /mnt/biology/donaldson/tom/flower_map_new/out/070921_North/segments/existing_watershed/100_0007_0002.json
+
+```
 
