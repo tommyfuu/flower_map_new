@@ -77,14 +77,6 @@ PARAMS = {
         'high': 5,
         'low': 4
     },
-    # 'num_of_color_features': {
-    #     'high': 3,
-    #     'low': 2
-    # },
-    # 'num_of_texture_features': {
-    #     'high': 2,
-    #     'low': 1
-    # },
     # TODO: will be useful in closing holes
     'morho': {
         'big_kernel_size': 24,
@@ -115,21 +107,7 @@ PARAMS_DICT = {
     "th_homogeneity": 27.108396,
 }
 
-# current_sum = sum(PARAMS_DICT.values())
-# print("current sum:", current_sum)
-# for key in PARAMS_DICT:
-#     PARAMS_DICT[key] = current_sum/PARAMS_DICT[key]
 
-
-# print("1", PARAMS_DICT)
-# # for key in PARAMS_DICT:
-# #     PARAMS_DICT[key] = 1/PARAMS_DICT[key]
-
-# current_sum = sum(PARAMS_DICT.values())
-# for key in PARAMS_DICT:
-#     PARAMS_DICT[key] = PARAMS_DICT[key]/current_sum
-
-# print(PARAMS_DICT)
 
 def sliding_window(img, fnctn, size, num_features=1, skip=0):
     """
@@ -187,14 +165,6 @@ blur_energy = np.uint8(texture[:,:,3]*255/texture[:,:,3].max())
 blur_homogeneity = np.uint8(texture[:,:,2]*255)
 
 
-# cv.imwrite('/mnt/biology/donaldson/tom/flower_map_new/newData/070921_North/'+name_img+'_blue_OG.JPG', blur_blue)
-# cv.imwrite('/mnt/biology/donaldson/tom/flower_map_new/newData/070921_North/'+name_img+'_green_OG.JPG', blur_green)
-# cv.imwrite('/mnt/biology/donaldson/tom/flower_map_new/newData/070921_North/'+name_img+'_red_OG.JPG', blur_red)
-# cv.imwrite('/mnt/biology/donaldson/tom/flower_map_new/newData/070921_North/'+name_img+'_gradient_OG.JPG', blur_gradient)
-# cv.imwrite('/mnt/biology/donaldson/tom/flower_map_new/newData/070921_North/'+name_img+'_contrast_OG.JPG', blur_contrast)
-# cv.imwrite('/mnt/biology/donaldson/tom/flower_map_new/newData/070921_North/'+name_img+'_correlation_OG.JPG', blur_correlation)
-# cv.imwrite('/mnt/biology/donaldson/tom/flower_map_new/newData/070921_North/'+name_img+'_energy_OG.JPG', blur_energy)
-# cv.imwrite('/mnt/biology/donaldson/tom/flower_map_new/newData/070921_North/'+name_img+'_homogeneity_OG.JPG', blur_homogeneity)
 
 
 # 2. adaptive guassian thresholding
@@ -229,39 +199,8 @@ th_green_1 = th_green/255
 th_red_1 = th_red/255
 th_gradient_1 = th_gradient/255
 th_contrast_1 = th_contrast/255
-# th_correlation_1 = th_correlation/255
-# th_energy_1 = th_energy/255
 th_homogeneity_1 = th_homogeneity/255
 
-# sum_thresholds = th_blue_1+th_green_1+th_red_1+th_gradient_1+th_contrast_1+th_correlation_1+th_energy_1+th_homogeneity_1
-# sum_thresholds = th_blue_1+th_green_1+th_red_1+th_gradient_1+th_contrast_1+th_homogeneity_1
-
-# PARAMS_DICT = {
-#     "th_blue": 21.838007,
-#     "th_green": 7.186267,
-#     "th_red": 35.805404,
-#     "th_gradient": 43.179289,
-#     "th_contrast": 26.178679,
-#     "th_homogeneity": 27.108396,
-# }
-
-# for key in PARAMS_DICT:
-#     PARAMS_DICT[key] = 1/(PARAMS_DICT[key]/sum(PARAMS_DICT.values()))
-
-# for key in PARAMS_DICT:
-#     PARAMS_DICT[key] = PARAMS_DICT[key]/sum(PARAMS_DICT.values())
-
-# print(PARAMS_DICT)
-# PARAMS_DICT = {}
-# with open(str(args.out)+'/glm_model_params.txt') as file:
-#     for line in file:
-#         print(line)
-#         if 'PARAMS' not in line and 'dtype:' not in line:
-#             current_pairs = line.split(' ')
-#             print(current_pairs)
-#             PARAMS_DICT[current_pairs[0]] = float(current_pairs[-1].split('\n')[0])
-
-# print(PARAMS_DICT)
 
 if ("th_blue" not in PARAMS_DICT) or ("th_green" not in PARAMS_DICT) or ("th_red" not in PARAMS_DICT) or ("th_gradient" not in PARAMS_DICT) or ("th_contrast" not in PARAMS_DICT) or ("th_homogeneity" not in PARAMS_DICT):
     print("ERROR: th_blue, th_green, th_red, th_gradient, th_contrast, th_homogeneity not in PARAMS_DICT")
@@ -274,7 +213,7 @@ for k in PARAMS_DICT:
 
 sum_thresholds = th_blue_1*PARAMS_DICT["th_blue"]+th_green_1*PARAMS_DICT["th_green"]+th_red_1*PARAMS_DICT["th_red"]+th_gradient_1*PARAMS_DICT["th_gradient"]+th_contrast_1*PARAMS_DICT["th_contrast"]+th_homogeneity_1*PARAMS_DICT["th_homogeneity"]
 
-print(np.unique(sum_thresholds))
+
 # according to the two hyperparameters, thresholding
 print('thresholding')
 # thresh_high = (sum_thresholds > (PARAMS['num_of_features']['high'])) * np.uint8(255)
@@ -283,21 +222,8 @@ print('thresholding')
 
 thresh_high = (sum_thresholds > (PARAMS['num_of_features']['high']/6)) * np.uint8(255)
 thresh_low = (sum_thresholds > (PARAMS['num_of_features']['low']/6)) * np.uint8(255)
-print(np.unique(thresh_high))
-print(np.unique(thresh_low))
 
-cv.imwrite('/mnt/biology/donaldson/tom/flower_map_new/newData/070921_North/0411Results/'+name_img+'_high_OG_' +str(PARAMS['threshold']['block_size'])+ '.JPG', thresh_high)
-cv.imwrite('/mnt/biology/donaldson/tom/flower_map_new/newData/070921_North/0411Results/'+name_img+'_low_OG_' +str(PARAMS['threshold']['block_size'])+ '.JPG', thresh_low)
 
-# noise removal
-# thresh_high = cv.fastNlMeansDenoising(
-#     thresh_high, None, PARAMS['noise_removal']['strength'],
-#     PARAMS['noise_removal']['templateWindowSize'], PARAMS['noise_removal']['searchWindowSize']
-# )
-# thresh_low = cv.fastNlMeansDenoising(
-#     thresh_low, None, PARAMS['noise_removal']['strength'],
-#     PARAMS['noise_removal']['templateWindowSize'], PARAMS['noise_removal']['searchWindowSize']
-# )
 print('performing morphological operations and hole filling')
 
 # method 1
@@ -308,23 +234,6 @@ high = cv.morphologyEx(filled, cv.MORPH_CLOSE, kernel)
 low = cv.morphologyEx(thresh_low, cv.MORPH_CLOSE, kernel)
 
 # method 2
-# filled = scipy.ndimage.binary_fill_holes(thresh_high) * np.uint8(255)
-# closing_high = cv.morphologyEx(filled, cv.MORPH_CLOSE, kernel)
-# filled1 = scipy.ndimage.binary_fill_holes(closing_high) * np.uint8(255)
-# high = cv.morphologyEx(filled1, cv.MORPH_CLOSE, kernel)
-
-# closing_low = cv.morphologyEx(thresh_low, cv.MORPH_CLOSE, kernel)
-# opening_low = cv.morphologyEx(closing_low, cv.MORPH_OPEN, kernel)
-# filled1 = scipy.ndimage.binary_fill_holes(closing_high) * np.uint8(255)
-# high = cv.morphologyEx(filled1, cv.MORPH_CLOSE, kernel)
-
-
-# cv.imwrite('/mnt/biology/donaldson/tom/flower_map_new/newData/070921_North/'+name_img+'__high_filled_new_' +str(PARAMS['threshold']['block_size'])+ '.JPG', high)
-# cv.imwrite('/mnt/biology/donaldson/tom/flower_map_new/newData/070921_North/'+name_img+'__low_filled_new_' +str(PARAMS['threshold']['block_size'])+ '.JPG', low)
-
-# high = cv.erode(thresh_high, kernel,iterations = 1)
-# low = cv.erode(thresh_low, kernel,iterations = 1)
-
 
 # first, create the kernels we use in the morpho operations
 small_kernel = np.ones((PARAMS['morho']['small_kernel_size'],)*2, np.uint8)
@@ -359,17 +268,7 @@ low = cv.morphologyEx(
     opening_low, cv.MORPH_CLOSE, small_kernel, iterations = PARAMS['morho']['low']['closing2']
 )
 
-cv.imwrite('/mnt/biology/donaldson/tom/flower_map_new/newData/070921_North/0411Results/'+name_img+'__high_filled_arya_' +str(PARAMS['threshold']['block_size'])+ '.JPG', high)
-cv.imwrite('/mnt/biology/donaldson/tom/flower_map_new/newData/070921_North/0411Results/'+name_img+'__low_filled_arya_' +str(PARAMS['threshold']['block_size'])+ '.JPG', low)
 
-# cv.imwrite('/mnt/biology/donaldson/tom/flower_map_new/newData/070921_North/100_0007_0001_blue' +str(PARAMS['threshold']['block_size'])+ '.JPG', th_blue)
-# cv.imwrite('/mnt/biology/donaldson/tom/flower_map_new/newData/070921_North/100_0007_0001_green' +str(PARAMS['threshold']['block_size'])+ '.JPG', th_green)
-# cv.imwrite('/mnt/biology/donaldson/tom/flower_map_new/newData/070921_North/100_0007_0001_red' +str(PARAMS['threshold']['block_size'])+ '.JPG', th_red)
-# cv.imwrite('/mnt/biology/donaldson/tom/flower_map_new/newData/070921_North/100_0007_0001_gradient' +str(PARAMS['threshold']['block_size'])+ '.JPG', th_gradient)
-# cv.imwrite('/mnt/biology/donaldson/tom/flower_map_new/newData/070921_North/100_0007_0001_contrast' +str(PARAMS['threshold']['block_size'])+ '.JPG', th_contrast)
-# cv.imwrite('/mnt/biology/donaldson/tom/flower_map_new/newData/070921_North/100_0007_0001_correlation' +str(PARAMS['threshold']['block_size'])+ '.JPG', th_correlation)
-# cv.imwrite('/mnt/biology/donaldson/tom/flower_map_new/newData/070921_North/100_0007_0001_energy' +str(PARAMS['threshold']['block_size'])+ '.JPG', th_energy)
-# cv.imwrite('/mnt/biology/donaldson/tom/flower_map_new/newData/070921_North/100_0007_0001_homogeneity' +str(PARAMS['threshold']['block_size'])+ '.JPG', th_homogeneity)
 
 # save the resulting masks to files
 print('writing resulting masks to output files')

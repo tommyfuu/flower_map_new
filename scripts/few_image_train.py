@@ -37,6 +37,7 @@ import pylab
 import json
 import cv2 as cv
 print("AAAAA", args.texture_cache)
+
 # CONSTANTS
 PARAMS = {
     'texture': {
@@ -156,8 +157,6 @@ def get_single_binaryImg(json_path,img_path,binary_img_save):
             coco = COCO(annFile)
             imgIds = coco.getImgIds()
             img = coco.loadImgs(imgIds[0])[0]
-            # dataDir = img_path
-            # shutil.copy(os.path.join(dataDir, img['file_name']), color_img_save)
 
             # load and display instance annotations
             #  load the instance mask 
@@ -189,20 +188,15 @@ def get_single_binaryImg(json_path,img_path,binary_img_save):
                 endog_df = pd.DataFrame(binary_endog, columns = ['binary_endog'])
             else:
                 endog_df = endog_df.append(pd.DataFrame(binary_endog, columns = ['binary_endog']))
-            # binary_endog = list(binary_endog)
-            # print(binary_endog)
+
             print(endog_df.head())
 
-            # imgs = imgs.astype(np.uint8)
             binary_img_l.append(imgs)
-            # imgs = imgs.astype(np.int8)
             name_img = img['file_name'].split(".")[0]
             print(name_img)
             # calculate all the features
 
             img = cv.imread(str(args.cvat_path)+'/images/'+name_img+'.JPG')
-            # print(img.shape)
-            # name_img = str(args.image).split("/")[-1].split(".")[-2]
 
             gray = cv.cvtColor(img, cv.COLOR_BGR2GRAY)
             print("TEXTURE_CACHE", args.texture_cache)
@@ -236,19 +230,6 @@ def get_single_binaryImg(json_path,img_path,binary_img_save):
 
             # 2. adaptive guassian thresholding
             ### TODO: as of 3/1 night the only feature that doesn't work at all is correlation.
-            # th_blue = 255- cv.adaptiveThreshold(blur_blue,255,cv.ADAPTIVE_THRESH_GAUSSIAN_C,\
-            #             cv.THRESH_BINARY,PARAMS['threshold']['block_size'],PARAMS['threshold']['C'])
-            # th_green = 255- cv.adaptiveThreshold(blur_green,255,cv.ADAPTIVE_THRESH_GAUSSIAN_C,\
-            #             cv.THRESH_BINARY,PARAMS['threshold']['block_size'],PARAMS['threshold']['C'])
-            # th_red = 255- cv.adaptiveThreshold(blur_red,255,cv.ADAPTIVE_THRESH_GAUSSIAN_C,\
-            #             cv.THRESH_BINARY,PARAMS['threshold']['block_size'],PARAMS['threshold']['C'])
-            # th_gradient = 255- cv.adaptiveThreshold(blur_gradient,255,cv.ADAPTIVE_THRESH_GAUSSIAN_C,\
-            #             cv.THRESH_BINARY,PARAMS['threshold']['block_size'],PARAMS['threshold']['C'])
-            # th_contrast = 255 - cv.adaptiveThreshold(blur_contrast,255,cv.ADAPTIVE_THRESH_GAUSSIAN_C,\
-            #             cv.THRESH_BINARY,PARAMS['threshold']['block_size'],PARAMS['threshold']['C'])
-            # th_homogeneity = 255- cv.adaptiveThreshold(blur_homogeneity,255,cv.ADAPTIVE_THRESH_GAUSSIAN_C,\
-            #             cv.THRESH_BINARY,PARAMS['threshold']['block_size'],PARAMS['threshold']['C'])
-
             th_blue = blur_blue
             th_green = blur_green
             th_red = blur_red
