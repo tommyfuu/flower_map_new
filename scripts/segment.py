@@ -23,7 +23,7 @@ parser.add_argument(
     "out_low", help="the path to a file in which to store the coordinates of each extracted low confidence object"
 )
 parser.add_argument(
-    "--texture_cache", type=Path, help=
+    "--texture-cache", type=Path, help=
     """
         The path to an npy file containing the texture of the image if already calculated.
         (Providing this option can speed up repeated executions of this script on the same input.)

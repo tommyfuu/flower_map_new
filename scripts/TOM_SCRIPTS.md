@@ -77,12 +77,12 @@ depending on whether you use the texture-cache (if you run the original pipeline
 if you have the texture-cache
 
 ```
-python multi_feature_segment.py  --texture-cache /mnt/biology/donaldson/tom/flower_map_new/out/070921_North/segments/texture/100_0007_0001.npy /mnt/biology/donaldson/tom/flower_map_new/newData/070921_North/100_0007_0003.JPG /mnt/biology/donaldson/tom/flower_map_new/out/070921_North/segments/high/100_0007_0003_trial.json /mnt/biology/donaldson/tom/flower_map_new/out/070921_North/segments/low/100_0007_0003_trial.json
+python multi_feature_segment.py  --texture-cache /mnt/biology/donaldson/tom/flower_map_new/out/070921_North/segments/texture/100_0007_0001.npy /mnt/biology/donaldson/tom/flower_map_new/newData/070921_North/100_0007_0001.JPG /mnt/biology/donaldson/tom/flower_map_new/out/070921_North/segments/high/100_0007_0001_trial.json /mnt/biology/donaldson/tom/flower_map_new/out/070921_North/segments/low/100_0007_0001_trial.json
 ```
 
 if you do NOT have the texture-cache
 ```
-python multi_feature_segment.py  /mnt/biology/donaldson/tom/flower_map_new/newData/070921_North/100_0007_0003.JPG /mnt/biology/donaldson/tom/flower_map_new/out/070921_North/segments/high/100_0007_0003_trial.json /mnt/biology/donaldson/tom/flower_map_new/out/070921_North/segments/low/100_0007_0003_trial.json
+python multi_feature_segment.py  /mnt/biology/donaldson/tom/flower_map_new/newData/070921_North/100_0007_0003.JPG /mnt/biology/donaldson/tom/flower_map_new/out/070921_North/segments/high/100_0007_0003_trial.json /mnt/biology/donaldson/tom/flower_map_new/out/070921_North/segments/low/100_0007_0001_trial.json
 ```
 
 ### otsu_binarization.py
