@@ -73,6 +73,7 @@ Note that after this is done without any issues, you will be given 2 resultant c
 
 Running these commands will require RClone, which you can install by using the commands listed [here](https://anaconda.org/conda-forge/rclone).
 
+RClone might require prior set up from command line, you can do that by typing in `rclone config` in terminal and finish setting it up in the way you desire. One example on setting it up can be found in [this document](https://docs.google.com/document/d/1eikj_XFX3dv1gD2FTH-xkE46AWknP0QViZqG6N8WmZ0/edit#bookmark=id.wrkoufkfttnc) (If you are a bee lab member, you should have access to this document.) 
 
 ### multi_feature_segment.py
 
