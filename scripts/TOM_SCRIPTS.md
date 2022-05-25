@@ -69,6 +69,7 @@ You should follow the instructions as they come up. For example:
 
 Note that after this is done without any issues, you will be given 2 resultant commands to run to actually upload all images to google drive using RClone, for example:
 
+![RClone commands](https://github.com/tommyfuu/flower_map_new/blob/master/scripts/exp_pics/find_images_upload.png)
 
 Running these commands will require RClone, which you can install by using the commands listed [here](https://anaconda.org/conda-forge/rclone).
 
@@ -125,7 +126,13 @@ In our case, [process_name] can be replaced with `watershed`, `otsu`, `existing`
 
 And the follow instructions to input specific paths you might need, examples are shown below:
 
+![existing segmentation method](https://github.com/tommyfuu/flower_map_new/blob/master/scripts/exp_pics/existing.png)
 
+The multi-feature thresholding method is extremely similar to the existing one in terms of commands to run it, thus no example shown.
+
+![otsu](https://github.com/tommyfuu/flower_map_new/blob/master/scripts/exp_pics/otsu.png)
+
+![watershed](https://github.com/tommyfuu/flower_map_new/blob/master/scripts/exp_pics/watershed.png)
 
 
 ### segment.py
@@ -152,6 +159,8 @@ python segment.py  /mnt/biology/donaldson/tom/flower_map_new/newData/070921_Nort
 
 ### visualizePolygons.py
 
+A script to be run an image directory along with its json annotation to visualize all the annotations in image form.
+
 ```
 python visualizePolygons.py dataDir img_postfix annFile endDir jsonDir option
 ```
@@ -161,6 +170,15 @@ python visualizePolygons.py /mnt/biology/donaldson/tom/flower_map_new/newData/07
 ```
 
 ### watershed_single_image.py
+
+A script to be run on one image at a time to conduct watershed based on thresholding from two confidence levels.
+
+
+```
+python watershed_single_image.py image seg_high seg_low out_json
+```
+
+Example:
 
 
 ```
