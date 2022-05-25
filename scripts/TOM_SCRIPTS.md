@@ -58,11 +58,20 @@ if you do NOT have the texture-cache
 python few_image_train.py /mnt/biology/donaldson/tom/flower_map_new/mini_trainset /mnt/biology/donaldson/tom/flower_map_new/out 
 ```
 
-### TODO: LATERfind_images_upload.py [DO NOT TRY THIS YET]
+### find_images_upload.py 
 
 ```
-python find_images_upload.py /mnt/biology/donaldson/tom/flower_map_new/2017_6217East.csv /mnt/biology/donaldson/tom/flower_map/data/Week3/6217East /mnt/biology/donaldson/tom/flower_map_new/useful_images_summaries/2017_6217East_summary.txt /mnt/biology/donaldson/tom/flower_map_new/annotations/jsons_20176217_east knuthXGDrive:/Bee\ Lab/Projects/Bee Forage\ Mapping/Bee Forage\ Mapping\ -\ Tom Thesis/labelled\ data/2017_6217East
+python find_images_upload.py
 ```
+
+You should follow the instructions as they come up. For example: 
+
+
+Note that after this is done without any issues, you will be given 2 resultant commands to run to actually upload all images to google drive using RClone, for example:
+
+
+Running these commands will require RClone, which you can install by using the commands listed [here](https://anaconda.org/conda-forge/rclone).
+
 
 ### multi_feature_segment.py
 
