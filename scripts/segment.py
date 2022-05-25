@@ -175,14 +175,14 @@ blur_contrast = cv.blur(texture[:,:,0], (PARAMS['blur']['contrast_kernel_size'],
 print('combining green and contrast values and removing more noise')
 combined = np.uint8(green_contrast(blur_green[:,:,1], blur_contrast) * 255)
 
-cv.imwrite('/mnt/biology/donaldson/tom/flower_map_new/newData/070921_North/'+name_img+'_original_segment_combined_.JPG', combined)
+# cv.imwrite('/mnt/biology/donaldson/tom/flower_map_new/newData/070921_North/'+name_img+'_original_segment_combined_.JPG', combined)
 
 combined = cv.fastNlMeansDenoising(
     combined, None, PARAMS['noise_removal']['strength'],
     PARAMS['noise_removal']['templateWindowSize'], PARAMS['noise_removal']['searchWindowSize']
 )
 
-cv.imwrite('/mnt/biology/donaldson/tom/flower_map_new/newData/070921_North/'+name_img+'_original_segment_combined_denoised.JPG', combined)
+# cv.imwrite('/mnt/biology/donaldson/tom/flower_map_new/newData/070921_North/'+name_img+'_original_segment_combined_denoised.JPG', combined)
 
 
 print('performing greyscale morphological closing')
@@ -230,8 +230,8 @@ low = cv.morphologyEx(
     opening_low, cv.MORPH_CLOSE, small_kernel, iterations = PARAMS['morho']['low']['closing2']
 )
 
-cv.imwrite('/mnt/biology/donaldson/tom/flower_map_new/newData/070921_North/'+name_img+'_original_segment_high_.JPG', high)
-cv.imwrite('/mnt/biology/donaldson/tom/flower_map_new/newData/070921_North/'+name_img+'_original_segment_low_.JPG', low)
+# cv.imwrite('/mnt/biology/donaldson/tom/flower_map_new/newData/070921_North/'+name_img+'_original_segment_high_.JPG', high)
+# cv.imwrite('/mnt/biology/donaldson/tom/flower_map_new/newData/070921_North/'+name_img+'_original_segment_low_.JPG', low)
 
 # save the resulting masks to files
 print('writing resulting masks to output files')

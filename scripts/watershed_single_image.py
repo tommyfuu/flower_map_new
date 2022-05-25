@@ -93,12 +93,11 @@ def export_results(ret, markers, out):
         raise Exception("Unsupported output file format.")
 
 img = cv.imread(args.img)
-print("AHH")
+
 high, low = None, None
 
 _, high, low = load_segments(str(args.high), str(args.low), high, low, img.shape[:2])
-# high = high.astype(np.float32)
-# low = np.uint8(low != 0)
+
 
 unknown = cv.subtract(low, high)
 
