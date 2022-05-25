@@ -22,13 +22,12 @@ args = parser.parse_args()
 #     if "original_segment" in image_name:
 #         os.remove(file)
 
-print("when input paths for ")
 if args.process_to_run == 'watershed':
     img_dir = input("Enter the path for image directory: ")
     high_dir = input("Enter the path for high confidence segment directory: ")
     low_dir = input("Enter the path for low confidence segment directory: ")
     out_dir = input("Enter the path for output directory including all watershed json files: ")
-    
+    Path(out_dir).mkdir(parents=True, exist_ok=True)
     for file in glob.glob(img_dir+"/*.JPG"):
         image_name = file.split("/")[-1].split(".")[0]
         if not os.path.isfile(out_dir+"/"+image_name+'.json'):
@@ -44,7 +43,8 @@ elif args.process_to_run == 'multifeature':
     texture_cache = input("Enter the path for texture cache directory, if not exist, type NA: ")
     high_dir = input("Enter the path for high confidence segment directory: ")
     low_dir = input("Enter the path for low confidence segment directory: ")
-
+    Path(high_dir).mkdir(parents=True, exist_ok=True)
+    Path(low_dir).mkdir(parents=True, exist_ok=True)
     for file in glob.glob(img_dir+"/*.JPG"):
         image_name = file.split("/")[-1].split(".")[0]
         if not os.path.isfile(high_dir+"/"+image_name+'.json'):
@@ -66,7 +66,8 @@ elif args.process_to_run == 'existing':
     texture_cache = input("Enter the path for texture cache directory, if not exist, type NA: ")
     high_dir = input("Enter the path for high confidence segment directory: ")
     low_dir = input("Enter the path for low confidence segment directory: ")
-
+    Path(high_dir).mkdir(parents=True, exist_ok=True)
+    Path(low_dir).mkdir(parents=True, exist_ok=True)
     for file in glob.glob(img_dir+"/*.JPG"):
         image_name = file.split("/")[-1].split(".")[0]
         if not os.path.isfile(high_dir+"/"+image_name+'.json'):
@@ -86,7 +87,6 @@ elif args.process_to_run == 'existing':
 elif args.process_to_run == 'otsu':
     img_dir = input("Enter the path for image directory: ")
     out_dir = input("Enter the path for the directory storing output json files: ")
-    Path(img_dir).mkdir(parents=True, exist_ok=True)
     Path(out_dir).mkdir(parents=True, exist_ok=True)
 
     for file in glob.glob(img_dir+"/*.JPG"):

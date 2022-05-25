@@ -66,7 +66,7 @@ python find_images_upload.py /mnt/biology/donaldson/tom/flower_map_new/2017_6217
 
 ### multi_feature_segment.py
 
-A script to be run on one image at a time to conduct multi-feature thresholding. To run this at scale, please check out `run_all_multifeature_thred.py`.
+A script to be run on one image at a time to conduct multi-feature thresholding. To run this at scale, please check out [run_all_multifeature_thred.py](#runallmultifeaturethredpy).
 
 ```
 python multi_feature_segment.py (--texture-cache TEXTURE_CACHE_FILE) image out_high out_low
@@ -87,6 +87,9 @@ python multi_feature_segment.py  /mnt/biology/donaldson/tom/flower_map_new/newDa
 
 ### otsu_binarization.py
 
+A script to be run on one image at a time to conduct otsu binary thresholding. To run this at scale, please check out [run_all_multifeature_thred.py](#runallmultifeaturethredpy).
+
+
 ```
 python otsu_binarization.py image out
 ```
@@ -95,9 +98,31 @@ example:
 ```
 python scripts/otsu_binarization.py /mnt/biology/donaldson/tom/flower_map_new/newData/070921_North/100_0007_0005.JPG /mnt/biology/donaldson/tom/flower_map_new/out/070921_North/segment_trash/100_0007_0005_trial.json
 ```
-### run_all_multifeature_thred.py TODO
+### run_all_multifeature_thred.py 
+
+A script to be run on a directory of images at a time to scale run one of the processes of your choice. The four choices include:
+- otsu binarization, one-time run seen [here](#otsubinarizationpy)
+- existing segmentation method, one-time run seen [here](#segmentpy)
+- multi-feature voting segmentation method, one-time run seen [here](#multifeaturesegmentpy)
+- watershed based on outputs of either existing or multi-feature thresholding methods, one-time run seen [here](#watershedsingleimagepy)
+
+You will need to run the script by inputting the type of process you would like to run at scale:
+
+```
+python run_all_multifeature_thred.py [process_name] 
+```
+
+In our case, [process_name] can be replaced with `watershed`, `otsu`, `existing`, or `multifeature`.
+
+And the follow instructions to input specific paths you might need, examples are shown below:
+
+
+
 
 ### segment.py
+
+A script to be run on one image at a time to conduct thresholding using the existing strategy. To run this at scale, please check out [run_all_multifeature_thred.py](#runallmultifeaturethredpy).
+
 
 ```
 python segment.py (--texture-cache TEXTURE_CACHE_FILE) image  out_high out_low
