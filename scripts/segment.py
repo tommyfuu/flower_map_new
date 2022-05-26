@@ -193,8 +193,8 @@ thresh_high = (combined > (PARAMS['threshold']['high'] * 255)) * np.uint8(255)
 # use a lower threshold to create the low confidence regions, so that they are larger
 thresh_low = (combined > (PARAMS['threshold']['low'] * 255)) * np.uint8(255)
 
-cv.imwrite('/mnt/biology/donaldson/tom/flower_map_new/out/070921_North/og_segment_stuff/'+name_img+'high_og.jpg', thresh_high)
-cv.imwrite('/mnt/biology/donaldson/tom/flower_map_new/out/070921_North/og_segment_stuff/'+name_img+'low_og.jpg', thresh_low)
+# cv.imwrite('/mnt/biology/donaldson/tom/flower_map_new/out/070921_North/og_segment_stuff/'+name_img+'high_og.jpg', thresh_high)
+# cv.imwrite('/mnt/biology/donaldson/tom/flower_map_new/out/070921_North/og_segment_stuff/'+name_img+'low_og.jpg', thresh_low)
 
 
 

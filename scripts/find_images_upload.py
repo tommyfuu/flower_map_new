@@ -12,25 +12,32 @@ from subprocess import Popen, PIPE
 # upload_jsons('/mnt/biology/donaldson/tom/flower_map_new/annotations/jsons_20176217_east', 
 #             '"knuthXGDrive:/Bee Lab/Projects/Bee Forage Mapping/Bee Forage Mapping - Tom Thesis/labelled data/2017_6217East"')
 
-parser = argparse.ArgumentParser(
-    description="find images and upload to google drive")
-)
-parser.add_argument(
-    "image_range", help="path to the csv file defining the range of images to be uploaded. example seen at /mnt/biology/donaldson/tom/flower_map_new/2017_6217East.csv.")
-)
-parser.add_argument(
-    "image_dir", help="path to the directory of images to be selected from. example seen at /mnt/biology/donaldson/tom/flower_map/data/Week3/6217East.")
-)
-parser.add_argument(
-    "output_txt_path", help="path to the file you want to include all the names of the files you are uploading. example seen at '/mnt/biology/donaldson/tom/flower_map_new/useful_images_summaries/2017_6217East_summary.txt'.")
-)
-parser.add_argument(
-    "jsons_path", help="path to the json files to be uploaded. example seen at: /mnt/biology/donaldson/tom/flower_map_new/annotations/jsons_20176217_east.")
-)
-parser.add_argument(
-    "gdrive_path", help="path to upload the files to.")
-)
-args = parser.parse_args()
+
+# parser = argparse.ArgumentParser(
+#     description="find images and upload to google drive"
+# )
+# parser.add_argument(
+#     "image_range", help="path to the csv file defining the range of images to be uploaded. example seen at /mnt/biology/donaldson/tom/flower_map_new/2017_6217East.csv."
+# )
+# parser.add_argument(
+#     "image_dir", help="path to the directory of images to be selected from. example seen at /mnt/biology/donaldson/tom/flower_map/data/Week3/6217East."
+# )
+# parser.add_argument(
+#     "output_txt_path", help="path to the file you want to include all the names of the files you are uploading. example seen at '/mnt/biology/donaldson/tom/flower_map_new/useful_images_summaries/2017_6217East_summary.txt'."
+# )
+# parser.add_argument(
+#     "jsons_path", help="path to the json files to be uploaded. example seen at: /mnt/biology/donaldson/tom/flower_map_new/annotations/jsons_20176217_east."
+# )
+# parser.add_argument(
+#     "gdrive_path", help="path to upload the files to."
+# )
+# args = parser.parse_args()
+
+csv_summary_path = input("path to the csv file defining the range of images to be uploaded. example seen at /mnt/biology/donaldson/tom/flower_map_new/2017_6217East.csv")
+image_dir = input("path to the directory of images to be selected from. example seen at /mnt/biology/donaldson/tom/flower_map/data/Week3/6217East")
+output_txt_path = input("path to the file you want to include all the names of the files you are uploading. example seen at /mnt/biology/donaldson/tom/flower_map_new/useful_images_summaries/2017_6217East_summary.txt")
+jsons_path = input("path to the json files to be uploaded. example seen at: /mnt/biology/donaldson/tom/flower_map_new/annotations/jsons_20176217_east")
+gdrive_path = input('path to upload the files to, example: "knuthXGDrive:/Bee Lab/Projects/Bee Forage Mapping/Bee Forage Mapping - Tom Thesis/labelled data/2017_6217East", note that the quote marks are necessary')
 
 def find_images(csv_summary_path, directory_path, output_txt_path, gDrive_path):
     a = pd.read_csv(csv_summary_path)
@@ -70,10 +77,7 @@ def find_images(csv_summary_path, directory_path, output_txt_path, gDrive_path):
     process = 'rclone copy '+directory_path+" "+gDrive_path+" "+include_from +" -v"
     print("prep finished, run the following command to upload all chosen images")
     print(process)
-    # process = Popen(['rclone', 'copy', directory_path, gDrive_path, include_from, '-v'], stdout=PIPE, stderr=PIPE)
-    # stdout, stderr = process.communicate()
     return all_contained_image_names
-
 
 
 # find_images('/mnt/biology/donaldson/tom/flower_map_new/070921_NorthHasPlants.csv',
@@ -127,6 +131,9 @@ def upload_jsons(json_folder, gDrive_path):
     # stdout, stderr = process.communicate()
     return
 
+
+find_images(csv_summary_path, image_dir, output_txt_path, gdrive_path)
+upload_jsons(jsons_path, gdrive_path)
 # upload_jsons('/mnt/biology/donaldson/tom/flower_map_new/annotations/jsons_20176217_east', 
 #             '"knuthXGDrive:/Bee Lab/Projects/Bee Forage Mapping/Bee Forage Mapping - Tom Thesis/dataToBeLabelled/2017_6217East_json"')
 
@@ -218,6 +225,6 @@ def upload_jsons(json_folder, gDrive_path):
 # upload_jsons('/mnt/biology/donaldson/tom/flower_map_new/annotations/jsons_20176917_west', 
 #             '"knuthXGDrive:/Bee Lab/Projects/Bee Forage Mapping/Bee Forage Mapping - Tom Thesis/labelled data/2017_6917West"')
 
-if __name__ == "__main__":
-    find_images(args.image_range, args.image_dir, args.output_txt_path, args.gdrive_path)
-    upload_jsons(args.jsons_path, args.gdrive_path)
+# if __name__ == "__main__":
+#     find_images(args.image_range, args.image_dir, args.output_txt_path, '\"'+args.gdrive_path+'\"')
+#     upload_jsons(args.jsons_path, '\"'+args.gdrive_path+'\"')
